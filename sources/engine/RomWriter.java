@@ -49,8 +49,8 @@ class RomWriter
 		
 		for (int i = 0; i < route.getTotalSlots(); i++)
 		{
-			buffer.put(route.getPokeByte(i));
 			buffer.put(route.getLvl(i));
+			buffer.put(route.getPokeByte(i));
 		}
 		
 		writeToRom(ch, buffer, route.getOffset());
@@ -69,11 +69,13 @@ class RomWriter
 		buffer.put(trainer.getName());
 		buffer.put((byte) 0x50); // name terminator
 		buffer.put(trainer.getKind());
+		buffer.put(trainer.getStatExp());
 		
 		for (int i = 0; i < trainer.getPartySize(); i++)
 			buffer.put(trainer.getPokeBytes(i));
 		
 		writeToRom(ch, buffer, pos);
+		//System.out.println(new String(convertBytesToText(trainer.getName())) + ": " + byteToValue(trainer.getStatExp()));
 	}
 	
 	void replaceAllTrainers(Trainer[] trainers) throws IOException

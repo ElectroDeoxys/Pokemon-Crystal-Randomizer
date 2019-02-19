@@ -32,7 +32,7 @@ class PokemonEditor
 			
 			for (int j = 0; j < move.length; j++)
 			{
-				byte[] moveRand = {move[j][0], (byte) (random() * 0xFB)};
+				byte[] moveRand = {move[j][0], (byte) (random() * N_MOVES)};
 				mons[i].setMove(j, moveRand);
 			}
 		}

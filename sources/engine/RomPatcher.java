@@ -73,9 +73,9 @@ class RomPatcher
 		
 		ByteBuffer buff = ByteBuffer.allocate(1);
 		buff.put((byte) 0x8D); // 55% percent that it holds an item
-		writeToRom(ch, buff, 0x3E933);
+		writeToRom(ch, buff, 0x3E921);
 		buff.put((byte) 0x16); // 9% percent that it holds the rarer item (0.55*0.09 ~= 0.05)
-		writeToRom(ch, buff, 0x3E93C);
+		writeToRom(ch, buff, 0x3E92A);
 	}
 	
 	void incrementTable(int pos, int length, byte[] ptrInit, int incr) throws IOException

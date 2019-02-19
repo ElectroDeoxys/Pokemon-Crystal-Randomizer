@@ -92,6 +92,12 @@ public class Move
 		return this.tier;
 	}
 	
+	public boolean isFixed()
+	{
+		// return true if it is a fixed power move
+		return (effect[0] == (byte) 0x29 || effect[0] == (byte) 0x94);
+	}
+	
 	/////////////////////////////////////////////
 	// Set value methods
 	/////////////////////////////////////////////	
@@ -138,6 +144,6 @@ public class Move
 	
 	public static int convertIndexToOffset(int n)
 	{
-		return 0x41AFB + 0x07 * n;
+		return OFFSET_MOVES + 0x07 * n;
 	}
 }

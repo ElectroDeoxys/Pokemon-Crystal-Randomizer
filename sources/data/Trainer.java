@@ -8,21 +8,23 @@ public class Trainer
 	private int offset; // offset in ROM
 	private byte[] name; // name of trainer
 	private byte trnKind; // whether the trainer has custom moves/items
+	private byte statExp; // stat exp byte
 	private byte[][] party = null; // [Party slot][Level, Species, Item, Moves]
 	
-	public Trainer(int index, int offset, byte[] name, byte trnKind, byte[][] party)
+	public Trainer(int index, int offset, byte[] name, byte trnKind, byte statExp, byte[][] party)
 	{
 		this.index = index;
 		this.offset = offset;
 		this.name = name;
 		this.trnKind = trnKind;
+		this.statExp = statExp;
 		this.party = party;
 	}
 	
 	public int getTotalSize()
 	{
 		int size = 0;
-		size += name.length + 2; // bytes for the name and trnKind
+		size += name.length + 3; // bytes for the name, statExp, and trnKind
 		size += party.length * bytesPerPoke();
 		
 		return size;
@@ -41,6 +43,11 @@ public class Trainer
 	public byte[] getName()
 	{
 		return this.name;
+	}
+	
+	public byte getStatExp()
+	{
+		return this.statExp;
 	}
 	
 	public byte getKind()
@@ -68,6 +75,11 @@ public class Trainer
 		return this.party[partyPos][0];
 	}
 	
+	public char[] getNameChar()
+	{
+		return convertBytesToText(this.name);
+	}
+	
 	private int bytesPerPoke()
 	{
 		int res = 0;
@@ -81,6 +93,11 @@ public class Trainer
 		}
 		
 		return res;
+	}
+	
+	public void setStatExp(byte statExp)
+	{
+		this.statExp = statExp;
 	}
 	
 	public void setPoke(int partyPos, byte pokeIndex)

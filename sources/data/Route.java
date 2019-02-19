@@ -26,7 +26,7 @@ public class Route
 	
 	private static int[] getIndexBreaks()
 	{
-		int[] indexBreaks = new int[N_WILD_ROUTES.length + 1]; // plus 1 for extra routes
+		int[] indexBreaks = new int[N_WILD_ROUTES.length];
 		
 		for (int i = 0; i < N_WILD_ROUTES.length; i++)
 		{
@@ -35,8 +35,6 @@ public class Route
 			for (int j = 0; j <= i; j++)
 				indexBreaks[i] += N_WILD_ROUTES[j];
 		}
-		
-		indexBreaks[N_WILD_ROUTES.length] = indexBreaks[N_WILD_ROUTES.length - 1] + N_WILD_ROUTES_EXT; // add the extra routes
 		
 		return indexBreaks;
 	}
@@ -55,16 +53,14 @@ public class Route
 	{
 		int offset;
 		
-		if (n < indexBreaks[0]) // Johto land route
+		if (n < indexBreaks[0]) 	 // Johto land route
 			offset = OFFSET_WILD[0] + N_BYTES_WILD[0] * n;
 		else if (n < indexBreaks[1]) // Johto water route
 			offset = OFFSET_WILD[1] + N_BYTES_WILD[1] * (n - indexBreaks[0]);
 		else if (n < indexBreaks[2]) // Kanto land route
 			offset = OFFSET_WILD[2] + N_BYTES_WILD[0] * (n - indexBreaks[1]);
-		else if (n < indexBreaks[3]) // Kanto water route
+		else						 // Kanto water route
 			offset = OFFSET_WILD[3] + N_BYTES_WILD[1] * (n - indexBreaks[2]);
-		else // extra routes
-			offset = OFFSET_WILD_EXT + N_BYTES_WILD[0] * (n - indexBreaks[3]);
 
 		return offset;
 	}	
@@ -166,7 +162,7 @@ public class Route
 		
 		if ((n < indexBreaks[0]) || (n >= indexBreaks[1] && n < indexBreaks[2]))
 			lIndex = 0;
-		else if (n < indexBreaks[3]) // not an extra route
+		else 
 			lIndex = 1;
 		
 		return lIndex;

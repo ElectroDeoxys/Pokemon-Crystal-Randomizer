@@ -173,7 +173,7 @@ class MoveSorter
 	
 	byte[] getTierMoveset(byte[] lvlMoves, byte[] eggMoves, boolean[] moveComp, byte[] monTypes, byte[] baseStats, byte lvl)
 	{
-		ArrayList<Move> newMoves = new ArrayList<Move>();
+		ArrayList<Move> listMoves = new ArrayList<Move>();
 		int maxPower; // limit damage output in TMs and egg moves
 		int maxTier; // limit status tiers 
 		
@@ -182,7 +182,7 @@ class MoveSorter
 			maxPower = 60;
 			maxTier = (int) floor((N_MOVE_TIERS - 1)/3);
 		}
-		else if (byteToValue(lvl) <= 25)
+		else if (byteToValue(lvl) <= 30)
 		{
 			maxPower = 80;
 			maxTier = (int) floor((N_MOVE_TIERS - 1)/2);
@@ -193,33 +193,13 @@ class MoveSorter
 			maxTier = (int) N_MOVE_TIERS - 1;
 		}
 		
-		// get all the best level up moves first
-		if (lvlMoves.length <= 4) // smaller movepool with no selection options
+		// get all the level up moves first
+		for (int i = 0; i < lvlMoves.length; i++) // run through all the level moves
 		{
-			for (int i = 0; i < 4; i++)
-				if (lvlMoves.length - 1 - i >= 0)
-				{
-					if (newMoves.contains(moves[byteToValue(lvlMoves[lvlMoves.length - 1 - i]) - 1])) // avoid repeats
-						continue;
-						
-					newMoves.add(moves[byteToValue(lvlMoves[lvlMoves.length - 1 - i]) - 1]);
-				}
-		}
-		else 
-		{
-			for (int i = 0; i < lvlMoves.length; i++) // run through all the level moves
-			{
-				if (newMoves.contains(moves[byteToValue(lvlMoves[i]) - 1])) // avoid repeats
-					continue;
-				
-				if (newMoves.size() < 4) // first 4 moves are free
-					newMoves.add(moves[byteToValue(lvlMoves[i]) - 1]);
-				else // do some selection
-				{
-					Move stackMove = moves[byteToValue(lvlMoves[i]) - 1];
-					compareMoves(stackMove, newMoves, monTypes, baseStats);
-				}
-			}
+			if (listMoves.contains(moves[byteToValue(lvlMoves[i]) - 1])) // avoid repeats
+				continue;
+			
+			listMoves.add(moves[byteToValue(lvlMoves[i]) - 1]);
 		}
 		
 		// run through the TM/HM/Move tutors 
@@ -231,15 +211,17 @@ class MoveSorter
 				continue;
 			if (movesTM[i].getCalcPower() <= 1 && movesTM[i].getTier() > maxTier) // skip powerful moves
 				continue;
-			if (newMoves.contains(movesTM[i])) // avoid repeats
+			if (listMoves.contains(movesTM[i])) // avoid repeats
 				continue;
 				
 			byte[] eff = movesTM[i].getEffect();
 			
+			/*
 			if (eff[0] == (byte) 0x21)
 				if ((byteToValue(baseStats[1]) >= 70 || byteToValue(baseStats[4]) >= 70) // it has good attacking stats
 					 || (byteToValue(baseStats[1]) + byteToValue(baseStats[4]) > byteToValue(baseStats[2]) + byteToValue(baseStats[5]))) // or is more offensive
 					continue; // skip Toxic
+			*/
 					
 			if (eff[0] == (byte) 0x69)
 				continue; // skip Thief
@@ -247,13 +229,8 @@ class MoveSorter
 			if (eff[0] == (byte) 0x87)
 				continue; // skip Hidden Power
 			
-			if (newMoves.size() < 4) // first 4 moves are free
-				newMoves.add(movesTM[i]);
-			else // do some selection
-			{
-				Move stackMove = movesTM[i];
-				compareMoves(stackMove, newMoves, monTypes, baseStats);
-			}
+			
+			listMoves.add(movesTM[i]);
 		}
 		
 		// run through the egg moves 
@@ -266,16 +243,20 @@ class MoveSorter
 				&& moves[byteToValue(eggMoves[i]) - 1].getTier() > maxTier) // skip powerful moves
 				continue;
 				
-			if (newMoves.contains(moves[byteToValue(eggMoves[i]) - 1])) // avoid repeats
+			if (listMoves.contains(moves[byteToValue(eggMoves[i]) - 1])) // avoid repeats
 				continue;
 			
-			if (newMoves.size() < 4) // first 4 moves are free
-				newMoves.add(moves[byteToValue(eggMoves[i]) - 1]);
-			else // do some selection
-			{
-				Move stackMove = moves[byteToValue(eggMoves[i]) - 1];
-				compareMoves(stackMove, newMoves, monTypes, baseStats);
-			}
+			listMoves.add(moves[byteToValue(eggMoves[i]) - 1]);
+		}
+		
+		ArrayList<Move> newMoves = new ArrayList<Move>();
+		
+		for (int i = 0; i < min(4, listMoves.size()); i ++) // first 4 are free
+			newMoves.add(listMoves.get(i));
+		
+		for (int i = 4; i < listMoves.size(); i ++) // rest of moves are selected
+		{
+			compareMoves(listMoves.get(i), newMoves, monTypes, baseStats);
 		}
 		
 		byte[] newMovesByte = new byte[4];
@@ -302,7 +283,30 @@ class MoveSorter
 			out = move.getCalcPower(); // do nothing with non-damaging moves
 		else
 		{
-			out = (moveType == types[0] || moveType == types[1] && (eff[0] != (byte) 0x29 && eff[0] != (byte) 0x94)) ? (int) (move.getCalcPower() * 1.5) : move.getCalcPower(); // apply STAB except to Future Sight
+			out = (moveType == types[0] || moveType == types[1] && (!move.isFixed())) ? (int) (move.getCalcPower() * 1.5) : move.getCalcPower(); // apply STAB except to Future Sight
+			
+			if (moveCat == 0b01000000) // physical/special move takes into account atk/satk
+				out = out * byteToValue(atk);
+			else
+				out = out * byteToValue(satk);
+		}
+			
+		return out;
+	}
+	
+	private int getPower(Move move, int dam, byte[] types, byte atk, byte satk)
+	{
+		// used to compare similar moves with appropriate boosts applied to dam
+		int out;
+		byte moveType = move.getType();
+		byte moveCat = move.getCat();
+		byte[] eff = move.getEffect();
+		
+		if (dam <= 1) 
+			out = dam; // do nothing with non-damaging moves
+		else
+		{
+			out = (moveType == types[0] || moveType == types[1] && (!move.isFixed())) ? (int) (dam * 1.5) : dam; // apply STAB except to fixed power
 			
 			if (moveCat == 0b01000000) // physical/special move takes into account atk/satk
 				out = out * byteToValue(atk);
@@ -348,7 +352,6 @@ class MoveSorter
 				for (int i = 0; i < 4; i++) // look into each move slot
 				{
 					Move thisSlotMove = moveSet.get(i);
-					byte[] eff = thisSlotMove.getEffect();
 					
 					if (replaced)
 						break;
@@ -360,10 +363,10 @@ class MoveSorter
 					slotMovePower = getPower(thisSlotMove, monTypes, baseStats[1], baseStats[4]);
 					
 					if (movePower > slotMovePower // if stack is stronger
-						|| (eff[0] == (byte) 0x94 && movePower * 2 > slotMovePower && move.getType() != (byte) 0x00)) // or if compared to Future Sight it can hit super-effective
+						|| ((thisSlotMove.isFixed()) && movePower * 2 > slotMovePower && move.getType() != (byte) 0x00)) // or if compared to Future Sight it can hit super-effective
 					{
 						if (!(repeatedType(move, moveSet, i)) // if there isn't another move of this type
-							&& !(move.getType() == (byte) 0x00 && movePower < 2 * slotMovePower && eff[0] != (byte) 0x94)) // if move isn't normal-type replacing coverage moves
+							&& !(move.getType() == (byte) 0x00 && movePower < 2 * slotMovePower && (!thisSlotMove.isFixed()))) // if move isn't normal-type replacing coverage moves
 						{
 							moveSet.set(i, move);
 							break; // no need looking more
@@ -388,6 +391,19 @@ class MoveSorter
 								
 							replaced = true;
 							break;
+						}
+					}
+					else if ((movePower >= slotMovePower - getPower(move, MOVE_DAM_MARGIN, monTypes, baseStats[1], baseStats[4]))  // check if it's a similar move in power
+						&& (nDam > 1 && move.getType() == thisSlotMove.getType()) // if it's of the same type
+						&& (!move.isFixed()) // not future sight
+						&& (!(repeatedType(move, moveSet, i))) // if there isn't another move of this type
+						&& (movePower > 1)) // and is damaging
+					{
+						if (random() < 0.5) // 50% of replacing
+						{
+							//System.out.println(byteToValue(thisSlotMove.getIndex()) + " -> " + byteToValue(move.getIndex()));
+							moveSet.set(i, move);
+							break; // no need looking more
 						}
 					}
 				}

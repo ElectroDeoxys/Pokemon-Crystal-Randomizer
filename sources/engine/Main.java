@@ -42,7 +42,7 @@ class Main
 			// randomizer settings
 			/////////////////////////////////////
 			
-			int starterKind = 2; // kinds of starters (0 = totally random, 1 = at least 1 evolution, 2 = 3-stage only)
+			int starterKind = 1; // kinds of starters (0 = totally random, 1 = at least 1 evolution, 2 = 3-stage only)
 			
 			boolean routeWSimilar = true; // route Pokemon with similar strength Pokemon
 			boolean routeNoLeg = true; // whether to have no legendary in wild or yes
@@ -103,6 +103,7 @@ class Main
 			
 			trainerEditor.buffKanto(monSorter, moveSorter);
 			trainerEditor.scaleLevel((float) 1.0);
+			trainerEditor.giveStatExp();
 			trainerEditor.randomizePokemon(monSorter, trainerWSimilar, typeExpert, persRival, trainerNoLeg);
 			trainerEditor.kantoForceEvolved(monSorter);
 			trainerEditor.applyMovesets(moveSorter, extraCust);
@@ -113,7 +114,7 @@ class Main
 			/////////////////////////////////////
 			
 			SavePatcher savPatcher = new SavePatcher(chSav);
-			savPatcher.generateTeam(monSorter, moveSorter, monEditor.getAllPokemon(), 4, 50);
+			savPatcher.generateTeam(monSorter, moveSorter, monEditor.getAllPokemon(), 5, 40);
 			savPatcher.updateChecksums();
 		}
 	}

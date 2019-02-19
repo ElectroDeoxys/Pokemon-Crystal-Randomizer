@@ -88,8 +88,6 @@ class RomReader
 		for (int i : N_WILD_ROUTES)
 			nRoutesTotal += i; // add all routes
 		
-		nRoutesTotal += N_WILD_ROUTES_EXT; // add extra routes
-		
 		Route[] routes = new Route[nRoutesTotal];
 		
 		for (int i = 0; i < nRoutesTotal; i++) // cycle all routes
@@ -104,8 +102,8 @@ class RomReader
 			
 			for(int j = 0; j < N_WILD_SLOTS[lIndex]; j++) // cycle slots to split Pokemon and Lvls
 			{
-				poke[j] = (byte) dataRead[2*j];
-				lvl[j] = (byte) dataRead[2*j+1];
+				poke[j] = (byte) dataRead[2*j+1];
+				lvl[j] = (byte) dataRead[2*j];
 			}
 		
 			routes[i] = new Route(i, poke, lvl);
@@ -127,6 +125,9 @@ class RomReader
 			pos += name.length + 1; // adjust the position
 			
 			byte trnKind = readByteFromRom(ch, pos);
+			pos++;
+			
+			byte statExp = readByteFromRom(ch, pos);
 			pos++;
 			
 			int sizeParty = lengthUntilByte(ch, pos, (byte) 0xFF);
@@ -192,7 +193,7 @@ class RomReader
 			}
 			
 			pos += sizeParty + 1; // adjust position for next trainer
-			trainers[i] = new Trainer(i, initPos, name, trnKind, party);
+			trainers[i] = new Trainer(i, initPos, name, trnKind, statExp, party);
 		}
 		
 		return trainers;

@@ -38,7 +38,7 @@ class TrainerEditor
 			byte[][] moves = new byte[size][4];
 			int[] partyTiers = new int[size];
 			
-			int newSize = (int) min(size + 1 + floor(random() * 3), 6);
+			int newSize = (int) min(size + floor(random() * 3), 6);
 			int[] newLvl = new int[newSize];
 			byte[] newParty = new byte[newSize];
 			byte[] newItems = new byte[newSize];
@@ -502,5 +502,22 @@ class TrainerEditor
 		}
 		
 		return out;
+	}
+	
+	void giveStatExp()
+	{
+		for (Trainer t : trainers)
+		{
+			// get lowest level (usually the first party slot)
+			int lvl = byteToValue(t.getLvl(0));
+			t.setStatExp(lvlToStatExp(lvl));
+		}
+	}
+	
+	private byte lvlToStatExp(int lvl)
+	{
+		// calculates stat exp to trainer Pokemon of level lvl
+		float poly = (float) (0.0265 * lvl * lvl - 0.2111 * lvl + 1.2497);
+		return valueToByte((int) floor(poly));
 	}
 }

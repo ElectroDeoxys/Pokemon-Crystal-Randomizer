@@ -5,17 +5,25 @@ import static java.lang.Math.*;
 public class Constants
 {
 	public static final int N_POKEMON_DATA = 493; // number of Pokemon in data
+	public static final int N_TRAINERS = 541;
+	public static final int N_POKEMON = byteToValue((byte) 0xFB);
+	public static final int N_TYPES = 18;
+	public static final int N_MOVES = byteToValue((byte) 0xFE);
+	public static final int N_TM = 50;
+	public static final int N_HM = 7;
+	public static final int N_MOVE_TUTOR = 3;
+	public static final int N_SPRITE_BANKS = 17; // number of banks for the sprite data
+	public static final int N_TRAINER_SPRITES = 67; 
 	
-	public static final int[] OFFSET_WILD = {0x2A5EF, 0x2B121, 0x2B27A, 0x2B7FB}; // offsets where wild Pokemon data start (Johto/Kanto)
-	public static final int OFFSET_WILD_EXT = 0x2B8D6; // extra 2 Johto land routes 
+	public static final int[] OFFSET_WILD = {0x2A5EE, 0x2B120, 0x2B279, 0x2B7FA}; // offsets where wild Pokemon data start (Johto/Kanto)
 	
-	public static final int OFFSET_TRAINERS = 0x39A2E;
-	public static final int OFFSET_TRAINERS_POINTERS = 0x399A8;
+	public static final int OFFSET_TRAINERS = 0x399C7;
+	public static final int OFFSET_TRAINERS_POINTERS = 0x39941;
 	
 	public static final int[][] OFFSET_STARTERS = {{0x78CFD, 0x78CFF, 0x78D16, 0x78D21}, // grass
 												   {0x78C7F, 0x78C81, 0x78C98, 0x78CA3}, // fire
 												   {0x78CC1, 0x78CC3, 0x78CDA, 0x78CE5}}; // water
-	public static final int OFFSET_MOVES = 0x41AFB;
+	public static final int OFFSET_MOVES = 0x41B05;
 	public static final int OFFSET_TM_MOVES = 0x1167A;
 	public static final int OFFSET_CRIT_MOVES = 0x346A3;
 	
@@ -25,36 +33,25 @@ public class Constants
 	public static final int OFFSET_SPRITES = 0x1205EE;
 	public static final int OFFSET_PAL = 0xA8C4;
 	
-	public static final int OFFSET_POKEMON_NAMES = 0x53363;
+	public static final int OFFSET_POKEMON_NAMES = 0x53379;
 	public static final int OFFSET_POKEMON_ICONS = 0x8EAC4;
 	
 	public static final int OFFSET_SPRITE_POINTERS_U = 0x124000; // Unown
 	public static final int N_UNOWN = 26; // number of Unown formes
 	public static final int INDEX_UNOWN = 201; // number of Unown index
 	
-	public static final int OFFSET_POKEMON_1 = 0x51403; // index, base stats, etc
-	public static final int OFFSET_POKEMON_2 = 0x427A7; // evolution data and level-up moves
+	public static final int OFFSET_POKEMON_1 = 0x51419; // index, base stats, etc
+	public static final int OFFSET_POKEMON_2 = 0x427C6; // evolution data and level-up moves
 	public static final int OFFSET_POKEMON_3 = 0x23D07; // egg moves
 	
-	public static final int OFFSET_POINTERS_1 = 0x425B1; // pointers to the evolution and move table
+	public static final int OFFSET_POINTERS_1 = 0x425D0; // pointers to the evolution and move table
 	public static final int OFFSET_POINTERS_2 = 0x23B11; // pointers to egg moves
 	
 	public static final int SIZE_EGG_MOVES_MEM = 0x2F9; // size of memory capable of holding egg moves
 	
-	public static final int[] N_WILD_SLOTS = {20, 2}; // number of Pokemon slots in a land/water route
-	public static final int[] N_BYTES_WILD = {((N_WILD_SLOTS[0] * 2) + 7), ((N_WILD_SLOTS[1] * 2) + 5)}; // number of bytes per land/water route
+	public static final int[] N_WILD_SLOTS = {21, 3}; // number of Pokemon slots in a land/water route
+	public static final int[] N_BYTES_WILD = {((N_WILD_SLOTS[0] * 2) + 5), ((N_WILD_SLOTS[1] * 2) + 3)}; // number of bytes per land/water route
 	public static final int[] N_WILD_ROUTES = {61, 38, 30, 24}; // number of routes with encounters (Johto/Kanto)
-	public static final int N_WILD_ROUTES_EXT = 2; // number of extra routes
-	
-	public static final int N_TRAINERS = 541;
-	public static final int N_POKEMON = byteToValue((byte) 0xFB);
-	public static final int N_TYPES = 17;
-	public static final int N_MOVES = byteToValue((byte) 0xFB);
-	public static final int N_TM = 50;
-	public static final int N_HM = 7;
-	public static final int N_MOVE_TUTOR = 3;
-	public static final int N_SPRITE_BANKS = 17; // number of banks for the sprite data
-	public static final int N_TRAINER_SPRITES = 67; 
 	
 	public static final int N_TIERS = 8 + 1;
 	public static final int N_TYPE_TIERS = 6;
@@ -67,6 +64,7 @@ public class Constants
 	public static final int MOVE_MID_TIER = (int) round((N_MOVE_TIERS - 1) / 2);
 	public static final int MOVE_2ND_TIER = (int) max(N_MOVE_TIERS - 2, 0);
 	public static final int MOVE_TOP_TIER = N_MOVE_TIERS - 1;
+	public static final int MOVE_DAM_MARGIN = 10; // margin of damage to replace a similar move
 	
 	public static final int NAME_LEN = 10; // length of names stored
 	
@@ -177,21 +175,33 @@ public class Constants
 	public static char[] convertBytesToText(byte[] byteStr)
 	{
 		char[] str = new char[byteStr.length];
-		char[] lookup = {'A', 'B', 'C', 'D', 'E', 
-						 'F', 'G', 'H', 'I', 'J', 
-						 'K', 'L', 'M', 'N', 'O', 
-						 'P', 'Q', 'R', 'S', 'T', 
-						 'U', 'V', 'W', 'X', 'Y', 'Z'};
+		char[] lookupAlpha = {'A', 'B', 'C', 'D', 'E', 
+							  'F', 'G', 'H', 'I', 'J', 
+							  'K', 'L', 'M', 'N', 'O', 
+							  'P', 'Q', 'R', 'S', 'T', 
+							  'U', 'V', 'W', 'X', 'Y', 'Z'};
+		
+		char[] lookupNum = {'0', '1', '2', '3', '4', 
+							'5', '6', '7', '8', '9'};
 		
 		for (int i = 0; i < str.length; i++)
 		{
 			int byteGet = byteToValue(byteStr[i]);
-			int indexChar = (int) (byteGet - 0x80);
 			
-			if ((indexChar < 0) || (indexChar >= lookup.length)) // sanitize array entry
-				str[i] = '?';
+			int[] indexChar = new int[2];
+			indexChar[0] = (int) (byteGet - 0x80);
+			indexChar[1] = (int) (byteGet - 0xF6);
+			
+			if ((indexChar[0] >= 0) && (indexChar[0] < lookupAlpha.length)) // is an alpha char
+				str[i] = lookupAlpha[indexChar[0]];
+			else if ((indexChar[1] >= 0) && (indexChar[1] < lookupNum.length)) // is a numerical char
+				str[i] = lookupNum[indexChar[1]];
+			else if (byteGet == 0xE3)
+				str[i] = '-';
+			else if (byteGet == 0xE8)
+				str[i] = '.';
 			else
-				str[i] = lookup[indexChar];
+				str[i] = '?';
 		}
 		
 		return str;

@@ -433,7 +433,31 @@ class DataReader
 		// converts text characters to in-game text bytes
 		byte[] nameOut = new byte[nameIn.length];
 		for (int i = 0; i < nameIn.length; i++)
-			nameOut[i] = (byte) (nameIn[i] + 0x3F);
+		{
+			//special characters
+			switch (nameIn[i])
+			{
+				case 0x20: nameOut[i] = (byte) 0x7F; // space
+					break;
+				case 0x27: nameOut[i] = (byte) 0xE0; // apostrophe
+					break;
+				case 0x2D: nameOut[i] = (byte) 0xE3; // dash
+					break;
+				case 0x2E: nameOut[i] = (byte) 0xE8; // dot
+					break;
+				default: break;
+			}
+				
+			int charI = byteToValue(nameIn[i]);
+			
+			if (charI >= 0x30 && charI < 0x40) // number
+				nameOut[i] = (byte) (nameIn[i] + 0xC6);
+			else if (charI >= 0x41 && charI < 0x5B) // letter
+				nameOut[i] = (byte) (nameIn[i] + 0x3F);
+			else // placeholder
+				nameOut[i] = (byte) 0xE6;
+		}
+		
 		return nameOut;
 	}
 	
