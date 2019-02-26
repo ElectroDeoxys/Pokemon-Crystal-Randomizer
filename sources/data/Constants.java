@@ -47,6 +47,14 @@ public class Constants
 	public static final int OFFSET_POINTERS_1 = 0x425D0; // pointers to the evolution and move table
 	public static final int OFFSET_POINTERS_2 = 0x23B11; // pointers to egg moves
 	
+	public static final int[] OFFSET_TYPE_ENHANCING_ITEMS = {0x69D1, 0x69D8, 0x69F4, 0x6A25,
+															 0x6A56, 0x6A5D, 0x6A6B, 0x6A87,
+															 0x6A95, 0x6AAA, 0x6AB1, 0x6AD4,
+															 0x6AF0, 0x6B28, 0x6B83, 0x6BA6,
+															 0x6BDE, 0x6C63};
+															 
+	public static final int[] OFFSET_WILD_ITEM_RATE = {0x3E921, 0x3E92A};
+	
 	public static final int SIZE_EGG_MOVES_MEM = 0x2F9; // size of memory capable of holding egg moves
 	
 	public static final int[] N_WILD_SLOTS = {21, 3}; // number of Pokemon slots in a land/water route

@@ -21,6 +21,21 @@ class RomWriter
 		this.ch = ch;
 	}
 	
+	static void writeToRom(FileChannel ch, byte b, int pos) throws IOException
+	{
+		byte[] bA = new byte[1];
+		bA[0] = b;
+		writeToRom(ch, bA, pos);
+	}
+	
+	static void writeToRom(FileChannel ch, byte[] b, int pos) throws IOException
+	{
+		ByteBuffer buffer = ByteBuffer.allocate(b.length);
+		buffer.put(b);
+		buffer.flip();
+		ch.write(buffer, pos);
+	}
+	
 	static void writeToRom(FileChannel ch, ByteBuffer buffer, int pos) throws IOException
 	{
 		buffer.flip();
@@ -33,27 +48,24 @@ class RomWriter
 	{
 		byte[] str = monSorter.getRandomStarters(starterKind); // array with the new starters
 		
-		ByteBuffer buffer = ByteBuffer.allocate(1);
-		
 		for (int i = 0; i < 3; i ++)
 			for (int pos : OFFSET_STARTERS[i])
 			{
-				buffer.put(str[i]);
-				writeToRom(ch, buffer, pos);
+				writeToRom(ch, str[i], pos);
 			}
 	}
 
 	void replaceRoutePokemon(Route route) throws IOException
 	{
-		ByteBuffer buffer = ByteBuffer.allocate(route.getTotalSlots() * 2);
+		byte[] b = new byte[route.getTotalSlots() * 2];
 		
 		for (int i = 0; i < route.getTotalSlots(); i++)
 		{
-			buffer.put(route.getLvl(i));
-			buffer.put(route.getPokeByte(i));
+			b[2*i] = route.getLvl(i);
+			b[2*i+1] = route.getPokeByte(i);
 		}
 		
-		writeToRom(ch, buffer, route.getOffset());
+		writeToRom(ch, b, route.getOffset());
 	}
 	
 	void replaceAllRoutePokemon(Route[] routes) throws IOException
@@ -86,11 +98,7 @@ class RomWriter
 		for (int i = 0; i <  TRAINER_GROUPS.length; i++) // cycle trainer groups
 		{
 			// update pointer table
-			
-			byte[] pointer = getPointer(pos);
-			ByteBuffer bufferPtr = ByteBuffer.allocate(2); 
-			bufferPtr.put(pointer);
-			writeToRom(ch, bufferPtr, ptrPos);
+			writeToRom(ch, getPointer(pos), ptrPos);
 			
 			ptrPos += 2;
 			
@@ -104,16 +112,11 @@ class RomWriter
 				replaceTrainer(trainers[j], size, pos);
 				pos += size;
 				
-				ByteBuffer bufferB = ByteBuffer.allocate(1);
-				byte[] term = {(byte) 0xFF};
-				bufferB.put(term);
-				writeToRom(ch, bufferB, pos);
+				writeToRom(ch, (byte) 0xFF, pos);
 				
 				pos++;
 			}
 		}
-		
-
 	}	
 	
 	void replaceAllPokemon(Pokemon[] mons) throws IOException
@@ -157,31 +160,26 @@ class RomWriter
 			// covering evolution and level-up move data
 			/////////////////////////////////////
 			
-			ByteBuffer buffer2 = ByteBuffer.allocate(mons[i].getNBytes() + 2); // plus 2 terminator bytes
+			ByteBuffer bufferEvo = ByteBuffer.allocate(mons[i].getNBytes() + 2); // plus 2 terminator bytes
 			
 			byte[][] evo = mons[i].getEvos();
 			byte[][] move = mons[i].getMoves();
 			
 			if (mons[i].hasEvos())
 				for (int j = 0; j < evo.length; j++)
-					buffer2.put(evo[j]);
+					bufferEvo.put(evo[j]);
 				
-			buffer2.put((byte) 0x00); // evolution terminator
+			bufferEvo.put((byte) 0x00); // evolution terminator
 			
 			for (int j = 0; j < move.length; j++)
-				buffer2.put(move[j]);		
+				bufferEvo.put(move[j]);		
 			
-			buffer2.put((byte) 0x00); // move terminator
+			bufferEvo.put((byte) 0x00); // move terminator
 			
-			writeToRom(ch, buffer2, pos1);
-			
-			byte[] pointer = getPointer(pos1);
+			writeToRom(ch, bufferEvo, pos1);
 			
 			// update pointer table
-			
-			ByteBuffer buffer3 = ByteBuffer.allocate(2); 
-			buffer3.put(pointer);
-			writeToRom(ch, buffer3, OFFSET_POINTERS_1 + 2*i);
+			writeToRom(ch, getPointer(pos1), OFFSET_POINTERS_1 + 2*i);
 			
 			pos1 += mons[i].getNBytes() + 2; // set position for the next entry
 			
@@ -194,20 +192,15 @@ class RomWriter
 			
 			if (eggMoves.length > 0) // if it has egg moves
 			{
-				ByteBuffer buffer4 = ByteBuffer.allocate(eggMoves.length + 1); // plus a terminator byte
+				ByteBuffer bufferEgg = ByteBuffer.allocate(eggMoves.length + 1); // plus a terminator byte
 					
-				buffer4.put(eggMoves);
-				buffer4.put((byte) 0xFF); // terminator
+				bufferEgg.put(eggMoves);
+				bufferEgg.put((byte) 0xFF); // terminator
 				
-				writeToRom(ch, buffer4, pos2);
-				pointer = getPointer(pos2);
+				writeToRom(ch, bufferEgg, pos2);
 
-				// update pointer table
-				
-				ByteBuffer buffer5 = ByteBuffer.allocate(2);
-				
-				buffer5.put(pointer);
-				writeToRom(ch, buffer5, OFFSET_POINTERS_2 + 2*i);
+				// update pointer table		
+				writeToRom(ch, getPointer(pos2), OFFSET_POINTERS_2 + 2*i);
 				
 				pos2 += eggMoves.length + 1; // set position for the next entry
 			}
@@ -225,25 +218,17 @@ class RomWriter
 			for (int j = name.length; j < nameWrite.length; j++) // fill with terminating bytes
 				nameWrite[j] = (byte) 0x50;
 			
-			ByteBuffer bufferName = ByteBuffer.allocate(nameWrite.length);
-			bufferName.put(nameWrite);
-			
-			writeToRom(ch, bufferName, OFFSET_POKEMON_NAMES + 10 * i);
+			writeToRom(ch, nameWrite, OFFSET_POKEMON_NAMES + 10 * i);
 			
 			/////////////////////////////////////
 			// icon
 			/////////////////////////////////////
 			
-			ByteBuffer bufferMisc = ByteBuffer.allocate(1);
-			bufferMisc.put(mons[i].getIcon());
-			
-			writeToRom(ch, bufferMisc, OFFSET_POKEMON_ICONS + i);			
+			writeToRom(ch, mons[i].getIcon(), OFFSET_POKEMON_ICONS + i);			
 		}
 		
 		// Pokemon with no egg moves need an 0xFF byte terminator at the end of the egg move list to point to
-		ByteBuffer buffer = ByteBuffer.allocate(1);
-		buffer.put((byte) 0xFF);
-		writeToRom(ch, buffer, pos2); // pos2 is already the ending offset
+		writeToRom(ch, (byte) 0xFF, pos2); // pos2 is already the ending offset
 		
 		for (int i = 0; i <  N_POKEMON; i++)
 		{
@@ -252,35 +237,29 @@ class RomWriter
 			if (eggMoves.length > 0) // if it has egg moves
 				continue; // skip
 			
-			ByteBuffer buffer1 = ByteBuffer.allocate(2);
-			buffer1.put(getPointer(pos2));
-			writeToRom(ch, buffer1, OFFSET_POINTERS_2 + 2*i);
+			writeToRom(ch, getPointer(pos2), OFFSET_POINTERS_2 + 2*i);
 		}
 	}
 	
 	void replaceMove(Move move) throws IOException
 	{
-		ByteBuffer buffer = ByteBuffer.allocate(7);
-
+		byte[] b = new byte[7];
 		byte[] effect = move.getEffect();
 		
-		buffer.put(move.getIndex());
-		buffer.put(effect[0]);
-		buffer.put(move.getBasePower());
-		buffer.put(move.getTypeCat());
-		buffer.put(move.getAcc());
-		buffer.put(move.getPP());
-		buffer.put(effect[1]);
+		b[0] = move.getIndex();
+		b[1] = effect[0];
+		b[2] = move.getBasePower();
+		b[3] = move.getTypeCat();
+		b[4] = move.getAcc();
+		b[5] = move.getPP();
+		b[6] = effect[1];
 		
-		writeToRom(ch, buffer, move.getOffset());
+		writeToRom(ch, b, move.getOffset());
 	}
 	
 	void replaceLearnableMove(Move move, int n) throws IOException
 	{
-		ByteBuffer buffer = ByteBuffer.allocate(1);
-		buffer.put(move.getIndex());
-		
-		writeToRom(ch, buffer, OFFSET_TM_MOVES + n);
+		writeToRom(ch, move.getIndex(), OFFSET_TM_MOVES + n);
 	}
 	
 	void replaceAllMoves(Move[] moves, Move[] movesTM) throws IOException
@@ -295,84 +274,56 @@ class RomWriter
 	void replaceSprite(Sprite sprite, int n, boolean isUnown) throws IOException
 	{
 		int[] pos = sprite.getOffset();
-		byte[] front = sprite.getFront();
-		byte[] back = sprite.getBack();
 		
-		ByteBuffer buffer1 = ByteBuffer.allocate(front.length);
-		buffer1.put(front);
-		writeToRom(ch, buffer1, pos[0]);
-		
-		ByteBuffer buffer2 = ByteBuffer.allocate(back.length);
-		buffer2.put(back);
-		writeToRom(ch, buffer2, pos[1]);
+		writeToRom(ch, sprite.getFront(), pos[0]);
+		writeToRom(ch, sprite.getBack(), pos[1]);
 		
 		// update the sprite dimensions
-		ByteBuffer bufferDim = ByteBuffer.allocate(1);
-		bufferDim.put(sprite.getDim());
 		if (isUnown)
-			writeToRom(ch, bufferDim, OFFSET_POKEMON_1 + 0x11 + (0x20 * (INDEX_UNOWN - 1)));
+			writeToRom(ch, sprite.getDim(), OFFSET_POKEMON_1 + 0x11 + (0x20 * (INDEX_UNOWN - 1)));
 		else
-			writeToRom(ch, bufferDim, OFFSET_POKEMON_1 + 0x11 + (0x20 * n));
+			writeToRom(ch, sprite.getDim(), OFFSET_POKEMON_1 + 0x11 + (0x20 * n));
 		
 		// update pointer
 		if (!(n == (INDEX_UNOWN - 1) && !isUnown))
 		{
 			byte[][] ptrs = sprite.getSpritePointer();
-			ByteBuffer bufferPtr = ByteBuffer.allocate(3);
-			bufferPtr.put(ptrs[0]);
-			
+
 			if (isUnown) // if it's the Unown slot
-				writeToRom(ch, bufferPtr, OFFSET_SPRITE_POINTERS_U + 6 * n);
+			{
+				writeToRom(ch, ptrs[0], OFFSET_SPRITE_POINTERS_U + 6 * n);
+				writeToRom(ch, ptrs[1], OFFSET_SPRITE_POINTERS_U + 6 * n + 3);
+			}
 			else
-				writeToRom(ch, bufferPtr, OFFSET_SPRITE_POINTERS + 6 * n);
-			
-			bufferPtr.put(ptrs[1]);
-			
-			if (isUnown) // if it's the Unown slot
-				writeToRom(ch, bufferPtr, OFFSET_SPRITE_POINTERS_U + 6 * n + 3);
-			else
-				writeToRom(ch, bufferPtr, OFFSET_SPRITE_POINTERS + 6 * n + 3);
+			{
+				writeToRom(ch, ptrs[0], OFFSET_SPRITE_POINTERS + 6 * n);
+				writeToRom(ch, ptrs[1], OFFSET_SPRITE_POINTERS + 6 * n + 3);
+			}	
 		}
 		
 		if (n == (INDEX_UNOWN - 1) && !isUnown) // replace Unown's pointer with 0xFF
 		{
 			byte[] ptr = {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
-			ByteBuffer bufferPtr = ByteBuffer.allocate(6);
-			bufferPtr.put(ptr);
-			writeToRom(ch, bufferPtr, OFFSET_SPRITE_POINTERS + 6 * n);
+			writeToRom(ch, ptr, OFFSET_SPRITE_POINTERS + 6 * n);
 		}
 	}
 	
 	void replaceTrainerSprite(Sprite sprite, int n) throws IOException
 	{
 		int[] pos = sprite.getOffset();
-		byte[] front = sprite.getFront();
-		
-		ByteBuffer buffer1 = ByteBuffer.allocate(front.length);
-		buffer1.put(front);
-		writeToRom(ch, buffer1, pos[0]);
+		writeToRom(ch, sprite.getFront(), pos[0]);
 		
 		byte[][] ptrs = sprite.getSpritePointer();
-		ByteBuffer bufferPtr = ByteBuffer.allocate(3);
-		bufferPtr.put(ptrs[0]);
-		
-		writeToRom(ch, bufferPtr, OFFSET_TRAINER_SPRITE_POINTERS + 3 * n);
+		writeToRom(ch, ptrs[0], OFFSET_TRAINER_SPRITE_POINTERS + 3 * n);
 	}
 	
 	void replaceEggSprite(Sprite sprite) throws IOException
 	{
 		int[] pos = sprite.getOffset();
-		byte[] front = sprite.getFront();
-		
-		ByteBuffer buffer1 = ByteBuffer.allocate(front.length);
-		buffer1.put(front);
-		writeToRom(ch, buffer1, pos[0]);
+		writeToRom(ch, sprite.getFront(), pos[0]);
 		
 		byte[][] ptrs = sprite.getSpritePointer();
-		ByteBuffer bufferPtr = ByteBuffer.allocate(3);
-		bufferPtr.put(ptrs[0]);
-		
-		writeToRom(ch, bufferPtr, OFFSET_SPRITE_POINTER_EGG);
+		writeToRom(ch, ptrs[0], OFFSET_SPRITE_POINTER_EGG);
 	}	
 	
 	void replaceAllSprites(Sprite[][] sprites, Sprite[] spritesTrn, Sprite spriteEgg, byte[][][] pal) throws IOException
@@ -403,11 +354,8 @@ class RomWriter
 		
 		// fill gap after pointer table
 		byte[] fill = {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
-		ByteBuffer bufferFill = ByteBuffer.allocate(6);
-		bufferFill.put(fill);
-		writeToRom(ch, bufferFill, OFFSET_SPRITE_POINTERS + 6 * N_POKEMON);
-		bufferFill.put(fill);
-		writeToRom(ch, bufferFill, OFFSET_SPRITE_POINTERS + 6 * N_POKEMON + 6);
+		writeToRom(ch, fill, OFFSET_SPRITE_POINTERS + 6 * N_POKEMON);
+		writeToRom(ch, fill, OFFSET_SPRITE_POINTERS + 6 * N_POKEMON + 6);
 		
 		replaceEggSprite(spriteEgg);
 		
@@ -415,10 +363,8 @@ class RomWriter
 		
 		for (int i = 0; i < pal.length; i++)
 		{
-			ByteBuffer bufferPal = ByteBuffer.allocate(8);
-			bufferPal.put(pal[i][0]); // regular
-			bufferPal.put(pal[i][1]); // shiny
-			writeToRom(ch, bufferPal, OFFSET_PAL + i*8);
+			writeToRom(ch, pal[i][0], OFFSET_PAL + i*8);
+			writeToRom(ch, pal[i][1], OFFSET_PAL + i*8+4);
 		}
 	}
 }

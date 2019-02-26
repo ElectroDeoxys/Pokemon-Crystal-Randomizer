@@ -114,7 +114,7 @@ class Main
 			/////////////////////////////////////
 			
 			SavePatcher savPatcher = new SavePatcher(chSav);
-			savPatcher.generateTeam(monSorter, moveSorter, monEditor.getAllPokemon(), 5, 40);
+			savPatcher.generateTeam(monSorter, moveSorter, monEditor.getAllPokemon(), 5, 45);
 			savPatcher.updateChecksums();
 		}
 	}

@@ -92,62 +92,35 @@ class SavePatcher
 	{
 		for (int i = 0; i < 2; i++)
 			for (int j = 0; j < savMon.length; j++)
-			{
-				ByteBuffer buffer = ByteBuffer.allocate(1);
-				byte[] b = new byte[1];
-				
+			{				
 				// update species list
 				int posSpecies = OFFSET_SAVE_TEAM_SPECIES[i] + j;
-
-				b[0] = savMon[j].index;
-				buffer.put(b); // index
-				writeToRom(ch, buffer, posSpecies);
+				writeToRom(ch, savMon[j].index, posSpecies);
 				
 				// update party
 				int pos = OFFSET_SAVE_TEAM[i] + LENGTH_POKEMON_DATA * j;
-				
-				b[0] = savMon[j].index;
-				buffer.put(b); // index
-				writeToRom(ch, buffer, pos);
-				
-				ByteBuffer bufferItem = ByteBuffer.allocate(1);
-				b[0] = savMon[j].item;
-				bufferItem.put(b); // item
-				writeToRom(ch, bufferItem, pos + 0x01);
-				
-				ByteBuffer bufferMoves = ByteBuffer.allocate(4);
-				bufferMoves.put(savMon[j].moves); // moves
-				writeToRom(ch, bufferMoves, pos + 0x02);
+				writeToRom(ch, savMon[j].index, pos);
+				writeToRom(ch, savMon[j].item, pos + 0x01);
+				writeToRom(ch, savMon[j].moves, pos + 0x02);
 				
 				byte[] expByte = new byte[3];
 				expByte[0] = (byte) ((savMon[j].totalExp & 0xFF0000) >> 16);
 				expByte[1] = (byte) ((savMon[j].totalExp & 0x00FF00) >> 8);
 				expByte[2] = (byte) ((savMon[j].totalExp & 0x0000FF));
-				
-				ByteBuffer bufferExp = ByteBuffer.allocate(3);
-				bufferExp.put(expByte); // Exp
-				writeToRom(ch, bufferExp, pos + 0x08);
+				writeToRom(ch, expByte, pos + 0x08);
 				
 				int statExp = 25600;
 				byte[] statByte = new byte[2];
 				statByte[0] = (byte) ((statExp & 0xFF00) >> 8);
 				statByte[1] = (byte) ((statExp & 0x00FF));
 				
-				ByteBuffer bufferStat = ByteBuffer.allocate(2);
-				bufferStat.put(statByte); // HP Stat Exp
-				writeToRom(ch, bufferStat, pos + 0x0B);
-				bufferStat.put(statByte); // Attack Stat Exp
-				writeToRom(ch, bufferStat, pos + 0x0B + 1);
-				bufferStat.put(statByte); // Defense Stat Exp
-				writeToRom(ch, bufferStat, pos + 0x0B + 2);
-				bufferStat.put(statByte); // Speed Stat Exp
-				writeToRom(ch, bufferStat, pos + 0x0B + 3);
-				bufferStat.put(statByte); // Special Stat Exp
-				writeToRom(ch, bufferStat, pos + 0x0B + 4);
+				writeToRom(ch, statByte, pos + 0x0B); // HP Stat Exp
+				writeToRom(ch, statByte, pos + 0x0B + 1); // Attack Stat Exp
+				writeToRom(ch, statByte, pos + 0x0B + 2); // Defense Stat Exp
+				writeToRom(ch, statByte, pos + 0x0B + 3); // Speed Stat Exp
+				writeToRom(ch, statByte, pos + 0x0B + 4); // Special Stat Exp
 				
-				b[0] = valueToByte(savMon[j].lvl);
-				buffer.put(b); // Level
-				writeToRom(ch, buffer, pos + 0x1F);
+				writeToRom(ch, valueToByte(savMon[j].lvl), pos + 0x1F); // level
 			}
 	}
 	
@@ -170,13 +143,10 @@ class SavePatcher
 				pos++;
 			}
 		
-			ByteBuffer buffer = ByteBuffer.allocate(2);
-			byte[] b = new byte[2];
-			
+			byte[] b = new byte[2];	
 			b[0] = (byte) ((sum[i] & 0x00FF));
 			b[1] = (byte) ((sum[i] & 0xFF00) >> 8);
-			buffer.put(b);
-			writeToRom(ch, buffer, chsumPos[i]);
+			writeToRom(ch, b, chsumPos[i]);
 		}
 	}
 }
