@@ -12,6 +12,7 @@ public class Move
 	private byte acc;
 	private byte pP;
 	private int tier = 0;
+	private byte[] name;
 	
 	private int calcPower = 0; // calculated power
 	
@@ -91,6 +92,11 @@ public class Move
 	{
 		return this.tier;
 	}
+
+	public byte[] getName()
+	{
+		return this.name;
+	}
 	
 	public boolean isFixed()
 	{
@@ -140,6 +146,11 @@ public class Move
 	public void setTier(int tier)
 	{
 		this.tier = tier;
+	}
+
+	public void setName(byte[] name)
+	{
+		this.name = name;
 	}	
 	
 	public static int convertIndexToOffset(int n)

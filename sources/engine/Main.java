@@ -81,9 +81,9 @@ class Main
 			
 			moveEditor.updateMoves();
 			//moveEditor.randomizeTMs();
-			romWriter.replaceAllMoves(moveEditor.getAllMoves(), moveEditor.getAllLearnable());
+			romWriter.replaceAllMoves(moveEditor.getMoves(), moveEditor.getAllLearnable());
 			
-			MoveSorter moveSorter = new MoveSorter(moveEditor.getAllMoves(), moveEditor.getAllLearnable(), moveEditor.getCritAnims());
+			MoveSorter moveSorter = new MoveSorter(moveEditor.getMoves(), moveEditor.getAllLearnable(), moveEditor.getCritAnims());
 			
 			//monEditor.randomizeMovesets();
 			//monEditor.randomizeCompatibilities();
@@ -93,6 +93,7 @@ class Main
 			spriteEditor.packSprites();
 			romWriter.replaceAllSprites(spriteEditor.getAllSprites(), spriteEditor.getAllTrainerSprites(), spriteEditor.getEggSprite(), spriteEditor.getAllPalettes());
 			
+			Names names = new Names(monEditor.getAllPokemon(), trainerEditor.getTrainers(), moveEditor.getMoves());
 			PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), romReader.readRomStarters());
 			
 			romWriter.randomizeStarters(monSorter, starterKind);
@@ -108,6 +109,12 @@ class Main
 			trainerEditor.kantoForceEvolved(monSorter);
 			trainerEditor.applyMovesets(moveSorter, extraCust);
 			romWriter.replaceAllTrainers(trainerEditor.getTrainers());
+
+			/////////////////////////////////////
+			// console log
+			/////////////////////////////////////
+
+			trainerEditor.printCustTeams(names);
 			
 			/////////////////////////////////////
 			// manipulate save data

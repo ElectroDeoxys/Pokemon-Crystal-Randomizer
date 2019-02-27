@@ -133,7 +133,7 @@ class MoveEditor
 		moves[249].setAcc((byte) 0xD8);
 	}
 	
-	Move[] getAllMoves()
+	Move[] getMoves()
 	{
 		return moves;
 	}

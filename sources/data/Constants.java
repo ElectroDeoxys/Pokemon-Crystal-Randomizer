@@ -69,6 +69,7 @@ public class Constants
 	public static final int OFFSET_MOVES = 0x41B05;
 	public static final int OFFSET_TM_MOVES = 0x1167A;
 	public static final int OFFSET_CRIT_MOVES = 0x346A3;
+	public static final int OFFSET_MOVE_NAMES = 0x1C9F29;
 	
 	public static final int OFFSET_SPRITE_POINTERS = 0x120000;
 	public static final int OFFSET_TRAINER_SPRITE_POINTERS = 0x128000;
@@ -223,41 +224,6 @@ public class Constants
 		}
 		
 		return out;
-	}
-	
-	public static char[] convertBytesToText(byte[] byteStr)
-	{
-		char[] str = new char[byteStr.length];
-		char[] lookupAlpha = {'A', 'B', 'C', 'D', 'E', 
-							  'F', 'G', 'H', 'I', 'J', 
-							  'K', 'L', 'M', 'N', 'O', 
-							  'P', 'Q', 'R', 'S', 'T', 
-							  'U', 'V', 'W', 'X', 'Y', 'Z'};
-		
-		char[] lookupNum = {'0', '1', '2', '3', '4', 
-							'5', '6', '7', '8', '9'};
-		
-		for (int i = 0; i < str.length; i++)
-		{
-			int byteGet = byteToValue(byteStr[i]);
-			
-			int[] indexChar = new int[2];
-			indexChar[0] = (int) (byteGet - 0x80);
-			indexChar[1] = (int) (byteGet - 0xF6);
-			
-			if ((indexChar[0] >= 0) && (indexChar[0] < lookupAlpha.length)) // is an alpha char
-				str[i] = lookupAlpha[indexChar[0]];
-			else if ((indexChar[1] >= 0) && (indexChar[1] < lookupNum.length)) // is a numerical char
-				str[i] = lookupNum[indexChar[1]];
-			else if (byteGet == 0xE3)
-				str[i] = '-';
-			else if (byteGet == 0xE8)
-				str[i] = '.';
-			else
-				str[i] = '?';
-		}
-		
-		return str;
 	}
 
     public static int[] shuffleArray(int[] array) 

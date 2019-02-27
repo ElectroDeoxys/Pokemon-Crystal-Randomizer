@@ -75,11 +75,6 @@ public class Trainer
 		return this.party[partyPos][0];
 	}
 	
-	public char[] getNameChar()
-	{
-		return convertBytesToText(this.name);
-	}
-	
 	private int bytesPerPoke()
 	{
 		int res = 0;
@@ -123,13 +118,5 @@ public class Trainer
 	public void setParty(byte[][] party)
 	{
 		this.party = party;
-	}
-	
-	public void printInfo()
-	{
-		for (int i = 0; i < party.length; i++)
-		{
-			System.out.println("#" + byteToValue(party[i][1]) + " lvl" + byteToValue(party[i][0]));
-		}
 	}
 }

@@ -385,7 +385,8 @@ class RomReader
 	Move[] readRomMoves() throws IOException
 	{
 		Move[] moves = new Move[N_MOVES];
-		
+		int posNames = OFFSET_MOVE_NAMES;
+
 		for (int i = 0; i < N_MOVES; i++) // cycle all moves
 		{
 			int pos = Move.convertIndexToOffset(i);
@@ -393,6 +394,10 @@ class RomReader
 			byte[] effect = {dataRead[1], dataRead[6]};
 		
 			moves[i] = new Move(i, dataRead[0], effect, dataRead[2], dataRead[3], dataRead[4], dataRead[5]);
+
+			byte[] name = readTextFromRom(ch, posNames);
+			posNames += name.length + 1; // adjust the position
+			moves[i].setName(name);
 		}
 		
 		return moves;

@@ -474,4 +474,41 @@ class TrainerEditor
 		float poly = (float) (0.0265 * lvl * lvl - 0.2111 * lvl + 1.2497);
 		return valueToByte((int) floor(poly));
 	}
+
+	void printTeam(Names names, int n)
+	{
+		Trainer t = trainers[n];
+
+		System.out.println("~~ " + names.trainer(n) + " ~~");
+		for (int i = 0; i < t.getPartySize(); i++)
+		{
+			byte[] b = t.getPokeBytes(i);
+
+			System.out.println(names.pokemon(b[1]) + " lvl " + byteToValue(b[0]));
+
+			if (t.getKind() == 1)
+				for (int j = 0; j < 4; j++)
+					System.out.println(" - " + names.move(b[2+j]));
+			else if (t.getKind() == 3)
+				for (int j = 0; j < 4; j++)
+					System.out.println(" - " + names.move(b[3+j]));
+
+			System.out.println();
+		}
+	}
+
+	void printTeams(Names names)
+	{
+		for (int i = 0; i < trainers.length; i++)
+			printTeam(names, i);
+	}
+
+	void printCustTeams(Names names)
+	{
+		for (int i = 0; i < trainers.length; i++)
+		{
+			if (trainers[i].getKind() != 1 && trainers[i].getKind() != 3) continue;
+			printTeam(names, i);
+		}
+	}
 }

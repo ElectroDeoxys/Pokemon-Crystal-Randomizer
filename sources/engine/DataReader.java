@@ -279,7 +279,7 @@ class DataReader
 			/////////////////////////////////////
 			
 			int lenName = lengthUntilByte(chNames, posName, (byte) 0x0D);
-			monData[i].setName(convertName(readFromData(chNames, posName, lenName)));
+			monData[i].setName(Names.parseTextBytes(readFromData(chNames, posName, lenName)));
 			
 			posName += lenName + 2; // two separating bytes
 			
@@ -426,39 +426,6 @@ class DataReader
 		}
 		
 		return pal;
-	}
-	
-	byte[] convertName(byte[] nameIn)
-	{
-		// converts text characters to in-game text bytes
-		byte[] nameOut = new byte[nameIn.length];
-		for (int i = 0; i < nameIn.length; i++)
-		{
-			//special characters
-			switch (nameIn[i])
-			{
-				case 0x20: nameOut[i] = (byte) 0x7F; // space
-					break;
-				case 0x27: nameOut[i] = (byte) 0xE0; // apostrophe
-					break;
-				case 0x2D: nameOut[i] = (byte) 0xE3; // dash
-					break;
-				case 0x2E: nameOut[i] = (byte) 0xE8; // dot
-					break;
-				default: break;
-			}
-				
-			int charI = byteToValue(nameIn[i]);
-			
-			if (charI >= 0x30 && charI < 0x40) // number
-				nameOut[i] = (byte) (nameIn[i] + 0xC6);
-			else if (charI >= 0x41 && charI < 0x5B) // letter
-				nameOut[i] = (byte) (nameIn[i] + 0x3F);
-			else // placeholder
-				nameOut[i] = (byte) 0xE6;
-		}
-		
-		return nameOut;
 	}
 	
 	int getPicSize(FileChannel ch, int pos) throws IOException
