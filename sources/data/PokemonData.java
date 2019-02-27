@@ -9,7 +9,7 @@ public class PokemonData
 {
 	private int trueIndex; // national index of Pokemon
 	private byte[] base = new byte[6]; // base stats (hp, atk, def, spd, sat, sdf)
-	private byte[] type = new byte[2];
+	private byte[] typeByte = new byte[2];
 	
 	// misc data (catch rate, base exp, item1, item2, gender ratio, 
 	// egg steps, growth rate, egg group)
@@ -31,13 +31,15 @@ public class PokemonData
 	
 	private int tier = 0;
 	private int typeTier = 0;
+
+	private Type[] types = new Type[2];	
 	
-	public PokemonData(int trueIndex, byte[] base, byte[] type, byte[] misc, byte gfx, byte[] tmhmByte, byte[][] evo, int[] evoIndex, byte[][] move)
+	public PokemonData(int trueIndex, byte[] base, byte[] typeByte, byte[] misc, byte gfx, byte[] tmhmByte, byte[][] evo, int[] evoIndex, byte[][] move)
 	{
 		this.trueIndex = trueIndex;
 		
 		this.base = base;
-		this.type = type;
+		this.typeByte = typeByte;
 		this.misc = misc;
 		this.gfx = gfx;
 		this.tmhmByte = tmhmByte;
@@ -48,11 +50,13 @@ public class PokemonData
 		
 		this.eggMove = new byte[0]; // initialize egg moves
 		this.eggMoveCarry = new byte[0];
+
+		resolveType();
 	}
 	
 	public Pokemon convertPokemon(int newIndex, byte[][] newEvo, byte[] newPreEvo)
 	{	
-		Pokemon mon = new Pokemon(newIndex, trueIndex, base, type, misc, gfx, tmhmByte, newEvo, move);
+		Pokemon mon = new Pokemon(newIndex, trueIndex, base, typeByte, misc, gfx, tmhmByte, newEvo, move);
 		mon.setEggMoves(eggMove);
 		mon.setEggMovesCarry(eggMoveCarry);
 		mon.setPreEvo(newPreEvo);
@@ -77,26 +81,12 @@ public class PokemonData
 	
 	public byte[] getTypes()
 	{
-		return this.type;
+		return this.typeByte;
 	}
 
-	public int[] getIndexTypes()
+	public Type[] getIndexTypes()
 	{
-		int[] out = new int[2];
-		
-		for (int i = 0; i < 2; i++)
-		{
-			int typeValue = byteToValue(this.type[i]);
-			
-			if (typeValue < 6)
-				out[i] = typeValue;
-			else if (typeValue < 20) // skip over Bird-type
-				out[i] = typeValue - 1; // for indexes to not suffer jump
-			else // skip over the Physical-Special gap
-				out[i] = typeValue - 10 - 1;
-		}
-		
-		return out;
+		return this.types;
 	}
 	
 	public byte[] getMisc()
@@ -240,5 +230,18 @@ public class PokemonData
 	public void setIcon(byte icon)
 	{
 		this.icon = icon;
+	}
+
+	private void resolveType()
+	{
+		for (int i = 0; i < typeByte.length; i++)
+		{
+			for (Type t : Type.values())
+	        	if (t.byteIndex() == typeByte[i])
+	        	{
+	        		types[i] = t;
+	        		break;
+	        	}
+		}
 	}
 }

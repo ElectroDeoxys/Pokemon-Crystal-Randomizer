@@ -51,11 +51,13 @@ class PokedexRandomizer
 		int nDexMons = 0;
 		
 		// first ensure there are evo-lines with each type
-		for (int i = 0; i < N_TYPES; i++)
+		for (Type t : Type.values())
 		{
-			evoList.add(getRandomEvoLineType(monDataSorter, i, evoList));
+			if (t == Type.NO_TYPE) continue;
 			
-			for (int j = 0; j < evoLines[evoList.get(i)].length; j++)
+			evoList.add(getRandomEvoLineType(monDataSorter, t, evoList));
+			
+			for (int j = 0; j < evoLines[evoList.get(t.intIndex())].length; j++)
 				nDexMons++;
 			
 			nDexEvos++;
@@ -106,7 +108,7 @@ class PokedexRandomizer
 		return randEvoLine;
 	}
 	
-	private int getRandomEvoLineType(PokemonDataSorter monDataSorter, int type, ArrayList<Integer> curEvoList)
+	private int getRandomEvoLineType(PokemonDataSorter monDataSorter, Type type, ArrayList<Integer> curEvoList)
 	{
 		// returns a random evolution line that has given type with no repeats
 		int[] typeArray = monDataSorter.getPokemonOfType(type);

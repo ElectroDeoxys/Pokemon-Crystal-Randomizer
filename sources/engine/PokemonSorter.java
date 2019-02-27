@@ -70,19 +70,19 @@ class PokemonSorter
 			
 			// concerning type sorting
 			
-			int[] typeOfMon = mons[i].getIndexTypes();
+			Type[] typeOfMon = mons[i].getIndexTypes();
 			
-			typeHolder.get(typeOfMon[0]).add(mons[i].getIndex());
+			typeHolder.get(typeOfMon[0].intIndex()).add(mons[i].getIndex());
 			
-			if (!(typeOfMon[0] == 0 && typeOfMon[1] == 2)) // don't count Normal/Flying as Normal-type
-				typeTierHolder.get(typeOfMon[0]).get(indexTypeTier).add(mons[i].getIndex());
+			if (!(typeOfMon[0] == Type.NORMAL && typeOfMon[1] == Type.FLYING)) // don't count Normal/Flying as Normal-type
+				typeTierHolder.get(typeOfMon[0].intIndex()).get(indexTypeTier).add(mons[i].getIndex());
 			
 			if (typeOfMon[0] != typeOfMon[1]) // if dual-type
 			{
-				typeHolder.get(typeOfMon[1]).add(mons[i].getIndex());
+				typeHolder.get(typeOfMon[1].intIndex()).add(mons[i].getIndex());
 				
-				if (!(typeOfMon[0] == 6 && typeOfMon[1] == 2)) // don't count Bug/Flying as Flying-type
-					typeTierHolder.get(typeOfMon[1]).get(indexTypeTier).add(mons[i].getIndex());
+				if (!(typeOfMon[0] == Type.BUG && typeOfMon[1] == Type.FLYING)) // don't count Bug/Flying as Flying-type
+					typeTierHolder.get(typeOfMon[1].intIndex()).get(indexTypeTier).add(mons[i].getIndex());
 			}
 			
 			mons[i].setTypeTier(indexTypeTier);
@@ -184,29 +184,29 @@ class PokemonSorter
 		this.starterCand3Stages = strByte3Stages;
 	}
 	
-	byte getSameTier(Pokemon mon, int typeIndex, boolean noLeg, boolean onlyEvolved, boolean forcedMix, byte ... prevMon)
+	byte getSameTier(Pokemon mon, Type type, boolean noLeg, boolean onlyEvolved, boolean forcedMix, byte ... prevMon)
 	{
-		// typeIndex = -1 for type-independent
-		boolean bType = (typeIndex >= 0); // true if it's type exclusive
+		// type = NO_TYPE for type-independent
+		boolean bType = (type != Type.NO_TYPE); // true if it's type exclusive
 		
 		int tierN = (bType) ? mon.getOldTypeTier() : mon.getOldTier();
 		int trueIndex = mon.getTrueIndex();
 		byte newMon;
 		
 		if (prevMon.length > 0) // if this argument exists
-			newMon = getSameTier(tierN, trueIndex, typeIndex, noLeg, onlyEvolved, forcedMix, prevMon);
+			newMon = getSameTier(tierN, trueIndex, type, noLeg, onlyEvolved, forcedMix, prevMon);
 		else
-			newMon = getSameTier(tierN, trueIndex, typeIndex, noLeg, onlyEvolved, forcedMix);
+			newMon = getSameTier(tierN, trueIndex, type, noLeg, onlyEvolved, forcedMix);
 		
 		return newMon;
 	}
 	
-	byte getSameTier(int tierN, int trueIndex, int typeIndex, boolean noLeg, boolean onlyEvolved, boolean forcedMix, byte ... prevMon)
+	byte getSameTier(int tierN, int trueIndex, Type type, boolean noLeg, boolean onlyEvolved, boolean forcedMix, byte ... prevMon)
 	{
-		// typeIndex = -1 for type-independent
-		boolean bType = (typeIndex >= 0); // true if it's type exclusive
+		// type = NO_TYPE for type-independent
+		boolean bType = (type != Type.NO_TYPE); // true if it's type exclusive
 		
-		byte[] thisTier = (bType) ? byTypeStats[typeIndex][tierN] : byStats[tierN];
+		byte[] thisTier = (bType) ? byTypeStats[type.intIndex()][tierN] : byStats[tierN];
 		int n = 1; // number of loop
 		int lastIteration = tierN;
 		boolean randDir = (random() * 100 < 50); // 50% chance of starting up/down
@@ -223,7 +223,7 @@ class PokemonSorter
 				tierN -= pow(-1,n) * n;
 			
 			tierN = (bType) ? min(max(tierN, 0), N_TYPE_TIERS - 1) : min(max(tierN, 0), N_TIERS - 1); // constrain index search
-			thisTier = (bType) ? byTypeStats[typeIndex][tierN] : byStats[tierN];
+			thisTier = (bType) ? byTypeStats[type.intIndex()][tierN] : byStats[tierN];
 			validTier = getValidTier(thisTier, trueIndex, noLeg, onlyEvolved, forcedMix, prevMon);
 			
 			if (((bType) && (tierN == 0 || tierN == N_TYPE_TIERS - 1))
@@ -240,7 +240,7 @@ class PokemonSorter
 				while (validTier.length == 0)
 				{
 					tierN++;
-					thisTier = (bType) ? byTypeStats[typeIndex][tierN] : byStats[tierN];
+					thisTier = (bType) ? byTypeStats[type.intIndex()][tierN] : byStats[tierN];
 					validTier = getValidTier(thisTier, trueIndex, noLeg, onlyEvolved, forcedMix, prevMon);
 				}
 			}
@@ -251,7 +251,7 @@ class PokemonSorter
 				while (validTier.length == 0)
 				{
 					tierN--;
-					thisTier = (bType) ? byTypeStats[typeIndex][tierN] : byStats[tierN];
+					thisTier = (bType) ? byTypeStats[type.intIndex()][tierN] : byStats[tierN];
 					validTier = getValidTier(thisTier, trueIndex, noLeg, onlyEvolved, forcedMix, prevMon);
 				}
 			}
@@ -266,13 +266,13 @@ class PokemonSorter
 		return validTier[randPos];
 	}
 	
-	byte getSameTier(Pokemon mon, int[] typeIndex, boolean noLeg) // for multiple types
+	byte getSameTier(Pokemon mon, Type[] type, boolean noLeg) // for multiple types
 	{
 		// get the type array and return Pokemon of random type
 		// all types are equally likely to get chosen
 		
 		byte out = (byte) 0x00;
-		int len = typeIndex.length;
+		int len = type.length;
 
 		for (int i = 0; i < len; i++)
 		{
@@ -281,7 +281,7 @@ class PokemonSorter
 
 			if (r < p) // probability is dependent on how many types are left
 			{
-				out = getSameTier(mon, typeIndex[i], noLeg, false, false);
+				out = getSameTier(mon, type[i], noLeg, false, false);
 				break; // end the search
 			}
 		}
@@ -289,13 +289,13 @@ class PokemonSorter
 		return out;
 	}
 	
-	byte getSameTier(int tierN, int trueIndex, int[] typeIndex, boolean noLeg) // for multiple types
+	byte getSameTier(int tierN, int trueIndex, Type[] type, boolean noLeg) // for multiple types
 	{
 		// get the type array and return Pokemon of random type
 		// all types are equally likely to get chosen
 		
 		byte out = (byte) 0x00;
-		int len = typeIndex.length;
+		int len = type.length;
 
 		for (int i = 0; i < len; i++)
 		{
@@ -304,7 +304,7 @@ class PokemonSorter
 
 			if (r < p) // probability is dependent on how many types are left
 			{
-				out = getSameTier(tierN, trueIndex, typeIndex[i], noLeg, false, false);
+				out = getSameTier(tierN, trueIndex, type[i], noLeg, false, false);
 				break; // end the search
 			}
 		}
@@ -346,9 +346,31 @@ class PokemonSorter
 		return out;
 	}
 	
-	byte[] getPokemonOfType(int n) // for one single type
+	byte[] getPokemonOfType(Type type) // for one single type
 	{
-		return this.byType[n];
+		return this.byType[type.intIndex()];
+	}
+
+	byte[] getPokemonOfType(Type[] type) // for multiple types
+	{
+		int len = 0; // length of all type arrays
+		for (Type t : type) // cycle types
+		{
+			if (t == Type.NO_TYPE) continue;
+			len += byType[t.intIndex()].length;
+		}
+		
+		byte[] list = new byte[len];
+		int c = 0; // keep track of number of entries
+		
+		for (int i = 0; i < type.length; i++) // cycle types
+			for (int j = 0; j < byType[type[i].intIndex()].length; j++)
+			{
+				list[c] = byType[type[i].intIndex()][j];
+				c++;
+			}
+		
+		return list;
 	}
 	
 	int getPokemonOldTier(byte pokeByte, boolean bType)
@@ -356,25 +378,6 @@ class PokemonSorter
 		Pokemon mon = mons[byteToValue(pokeByte) - 1];
 		int out = (bType) ? mon.getOldTypeTier() : mon.getOldTier();
 		return out;
-	}
-	
-	byte[] getPokemonOfType(int[] n) // for multiple types
-	{
-		int len = 0; // length of all type arrays
-		for (int i : n) // cycle types
-			len += byType[i].length;
-		
-		byte[] list = new byte[len];
-		int c = 0; // keep track of number of entries
-		
-		for (int i = 0; i < n.length; i++) // cycle types
-			for (int j = 0; j < byType[n[i]].length; j++)
-			{
-				list[c] = byType[n[i]][j];
-				c++;
-			}
-		
-		return list;
 	}
 	
 	void printTiers(Pokemon[] mons)
@@ -545,7 +548,7 @@ class PokemonSorter
 					byte[] prevMonArray = convertByteArray(prevMonList.toArray(new Byte[0]));
 					Pokemon thisMon = mons[byteToValue(finalRivalTeam[i][j]) - 1];
 					
-					finalTeam[j] = getSameTier(thisMon, -1, noLeg, (!isLead), true, prevMonArray);
+					finalTeam[j] = getSameTier(thisMon, Type.NO_TYPE, noLeg, (!isLead), true, prevMonArray);
 					monSlots[j] = getEvoLine(finalTeam[j], -1);
 					
 					// may result in an unevolved Pokemon, so change it to be the final form in the last battle

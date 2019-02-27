@@ -4,10 +4,53 @@ import static java.lang.Math.*;
 
 public class Constants
 {
+	public enum Type 
+	{
+	    NORMAL   ((byte) 0x00,  0),
+	    FIGHTING ((byte) 0x01,  1),
+	    FLYING   ((byte) 0x02,  2),
+	    POISON   ((byte) 0x03,  3),
+	    GROUND   ((byte) 0x04,  4),
+	    ROCK     ((byte) 0x05,  5),
+	    BUG      ((byte) 0x07,  6),
+	    GHOST    ((byte) 0x08,  7),
+	    STEEL    ((byte) 0x09,  8),
+	    FIRE     ((byte) 0x14,  9),
+	    WATER    ((byte) 0x15, 10),
+	    GRASS    ((byte) 0x16, 11),
+	    ELECTRIC ((byte) 0x17, 12),
+	    PSYCHIC  ((byte) 0x18, 13),
+	    ICE      ((byte) 0x19, 14),
+	    DRAGON   ((byte) 0x1A, 15),
+	    DARK     ((byte) 0x1B, 16),
+	    FAIRY    ((byte) 0x1C, 17),
+	    NO_TYPE  ((byte) 0xFE, -1);
+
+	    private final byte byteIndex;
+	    private final int  intIndex;
+
+	    Type(byte byteIndex, int intIndex) 
+	    {
+	        this.byteIndex = byteIndex;
+	        this.intIndex  = intIndex;
+	    }
+
+	    public byte byteIndex() 
+	    { 
+	    	return byteIndex; 
+	    }
+
+	    public int intIndex() 
+	    { 
+	    	return intIndex; 
+	    }
+	}
+
+
 	public static final int N_POKEMON_DATA = 493; // number of Pokemon in data
 	public static final int N_TRAINERS = 541;
 	public static final int N_POKEMON = byteToValue((byte) 0xFB);
-	public static final int N_TYPES = 18;
+	public static final int N_TYPES = Type.values().length - 1;
 	public static final int N_MOVES = byteToValue((byte) 0xFE);
 	public static final int N_TM = 50;
 	public static final int N_HM = 7;
@@ -84,18 +127,20 @@ public class Constants
 	public static final int[][] INDEX_TRAINER_CLASSES = {{78, 96}, {188, 218}, {230, 248}, {274, 313}, {314, 326}, {349, 370}, {371, 379}, 
 														 {381, 383}, {384, 391}, {398, 406}, {407, 410}, {411, 422}, {471, 472}, 
 														 {485, 491}, {535, 539}}; // start and ending indexes (inclusive) of trainer classes
-	public static final int[][] TRAINER_CLASS_TYPES = {{2}, {0, 3, 16}, {6}, {10}, {0, 1, 10}, {1, 4, 5}, {3, 9}, {3, 9}, {9}, {1}, 
-													   {0, 3, 16}, {13}, {0, 3, 16}, {7, 13}, {0, 3, 16}}; // type arrays for each trainer classes defined above
+	public static final Type[][] TRAINER_CLASS_TYPES = {{Type.FLYING}, {Type.NORMAL, Type.POISON, Type.DARK}, {Type.BUG}, {Type.WATER}, {Type.NORMAL, Type.FIGHTING, Type.WATER}, 
+														{Type.FIGHTING, Type.GROUND, Type.ROCK}, {Type.POISON, Type.FIRE}, {Type.POISON, Type.FIRE}, {Type.FIRE}, {Type.FIGHTING}, 
+													    {Type.NORMAL, Type.POISON, Type.DARK}, {Type.PSYCHIC}, {Type.NORMAL, Type.POISON, Type.DARK}, {Type.GHOST, Type.PSYCHIC}, 
+													    {Type.NORMAL, Type.POISON, Type.DARK}}; // type arrays for each trainer classes defined above
 	public static final int[] INDEX_TRAINER_FISHER = {249, 274}; // start and ending indexes (inclusive) of fishers
 	
 	public static final int[][] INDEX_GYM_TRAINERS = {{79, 78, 0}, {515, 518, 235, 234, 236, 2}, {156, 157, 97, 98, 1}, {478, 486, 477, 485, 3},
 													  {399, 401, 402, 404, 6}, {5}, {224, 492, 225, 493, 494, 4}, {117, 137, 118, 119, 138, 7},
 													  {466, 31}, {294, 313, 312, 32}, {394, 348, 221, 33}, {519, 520, 441, 105, 169, 39},
 													  {102, 427, 453, 99, 114}, {490, 421, 491, 412, 229}, {380}, {}}; // last gym has no type specialist
-	public static final int[] GYM_TYPES = {2, 6, 0, 7, 1, 8, 14, 15,
-										   5, 10, 12, 11, 3, 13, 9, 0};
+	public static final Type[] GYM_TYPES = {Type.FLYING, Type.BUG, Type.NORMAL, Type.GHOST, Type.FIGHTING, Type.STEEL, Type.ICE, Type.DRAGON,
+										    Type.ROCK, Type.WATER, Type.ELECTRIC, Type.GRASS, Type.POISON, Type.PSYCHIC, Type.FIRE, Type.NORMAL};
 	public static final int[] INDEX_ELITE_FOUR = {23, 29, 27, 28};
-	public static final int[] ELITE_TYPES = {13, 3, 1, 16};
+	public static final Type[] ELITE_TYPES = {Type.PSYCHIC, Type.POISON, Type.FIGHTING, Type.DARK};
 	public static final int[] INDEX_MIXED_TRAINERS = {26, 30, 531, 532}; // trainer teams to guarantee mixed party
 	public static final int[][] INDEX_RIVAL = {{8, 11, 14, 17, 20, 341, 344},
 											 {9, 12, 15, 18, 21, 342, 345},
@@ -109,7 +154,7 @@ public class Constants
 	public static final int[] RIVAL_PARTY_SIZES = {1, 3, 4, 5, 6, 6, 6}; // rival team size for each battle
 	
 	public static final int[][] INDEX_ROUTE_SPECIFIC_TYPES = {{26, 27, 28, 29}, {103}}; // indexes of routes for each given type 
-	public static final int[][] ROUTE_TYPES = {{14}, {4, 5}}; // type arrays for each routes defined above
+	public static final Type[][] ROUTE_TYPES = {{Type.ICE}, {Type.GROUND, Type.ROCK}}; // type arrays for each routes defined above
 	
 	public static final int LEGENDARY_BST = 580; // minimum base stat total of legendary Pokemon
 	public static final int STARTER_BST = 350; // maximum base stat total of starter Pokemon
@@ -214,7 +259,7 @@ public class Constants
 		
 		return str;
 	}
-	
+
     public static int[] shuffleArray(int[] array) 
 	{
         int n = array.length;
@@ -246,6 +291,25 @@ public class Constants
             int randomValue =  i + (int) floor(random() * (n - i));
             // Swap the random element with the present element.
             byte randomElement = arrayOut[randomValue];
+            arrayOut[randomValue] = arrayOut[i];
+            arrayOut[i] = randomElement;
+        }
+		
+		return arrayOut;
+    }
+
+    public static Type[] shuffleArray(Type[] array) 
+	{
+        int n = array.length;
+		Type[] arrayOut = array;
+
+        // Loop over array.
+        for (int i = 0; i < arrayOut.length; i++) 
+		{
+            // Get a random index of the array past the current index.
+            int randomValue =  i + (int) floor(random() * (n - i));
+            // Swap the random element with the present element.
+            Type randomElement = arrayOut[randomValue];
             arrayOut[randomValue] = arrayOut[i];
             arrayOut[i] = randomElement;
         }

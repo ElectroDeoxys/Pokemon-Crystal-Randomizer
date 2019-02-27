@@ -10,7 +10,7 @@ public class Pokemon
 	private int index; // in-game index of Pokemon
 	private int trueIndex; // national index of Pokemon
 	private byte[] base = new byte[6]; // base stats (hp, atk, def, spd, sat, sdf)
-	private byte[] type = new byte[2];
+	private byte[] typeByte = new byte[2];
 	
 	// misc data (catch rate, base exp, item1, item2, gender ratio, 
 	// egg steps, growth rate, egg group)
@@ -33,15 +33,17 @@ public class Pokemon
 	private byte icon;
 	
 	private int oldTier = -1; // tier list to compare strengths from Pokemon it replaced in the old Pokedex
-	private int oldTypeTier = -1; // tier list to compare strengths for same type from Pokemon it replaced in the old Pokedex	
+	private int oldTypeTier = -1; // tier list to compare strengths for same type from Pokemon it replaced in the old Pokedex
+
+	private Type[] types = new Type[2];	
 	
-	public Pokemon(int index, int trueIndex, byte[] base, byte[] type, byte[] misc, byte gfx, byte[] tmhmByte, byte[][] evo, byte[][] move)
+	public Pokemon(int index, int trueIndex, byte[] base, byte[] typeByte, byte[] misc, byte gfx, byte[] tmhmByte, byte[][] evo, byte[][] move)
 	{
 		this.index = index;
 		this.trueIndex = trueIndex;
 		
 		this.base = base;
-		this.type = type;
+		this.typeByte = typeByte;
 		this.misc = misc;
 		this.gfx = gfx;
 		this.tmhmByte = tmhmByte;
@@ -53,6 +55,7 @@ public class Pokemon
 		this.eggMoveCarry = new byte[0];
 		
 		convertCompatibilities();
+		resolveType();
 	}
 	
 	/////////////////////////////////////////////
@@ -82,26 +85,12 @@ public class Pokemon
 	
 	public byte[] getTypes()
 	{
-		return this.type;
+		return this.typeByte;
 	}
 
-	public int[] getIndexTypes()
+	public Type[] getIndexTypes()
 	{
-		int[] out = new int[2];
-		
-		for (int i = 0; i < 2; i++)
-		{
-			int typeValue = byteToValue(this.type[i]);
-			
-			if (typeValue < 6)
-				out[i] = typeValue;
-			else if (typeValue < 20) // skip over Bird-type
-				out[i] = typeValue - 1; // for indexes to not suffer jump
-			else // skip over the Physical-Special gap
-				out[i] = typeValue - 10 - 1;
-		}
-		
-		return out;
+		return types;
 	}
 	
 	public byte[] getMisc()
@@ -316,9 +305,9 @@ public class Pokemon
 		this.base = base;
 	}
 	
-	public void setType(byte[] type)
+	public void setType(byte[] typeByte)
 	{
-		this.type = type;
+		this.typeByte = typeByte;
 	}
 	
 	public void setMisc(int n, byte value)
@@ -346,6 +335,19 @@ public class Pokemon
 				tmhmComp[i] = false;
 			else
 				tmhmComp[i] = true;
+		}
+	}
+
+	private void resolveType()
+	{
+		for (int i = 0; i < typeByte.length; i++)
+		{
+			for (Type t : Type.values())
+	        	if (t.byteIndex() == typeByte[i])
+	        	{
+	        		types[i] = t;
+	        		break;
+	        	}
 		}
 	}
 	

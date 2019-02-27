@@ -36,12 +36,12 @@ class PokemonDataSorter
 		{
 			// concerning type sorting
 			
-			int[] typeOfMon = monData[i].getIndexTypes();
+			Type[] typeOfMon = monData[i].getIndexTypes();
 			
-			typeHolder.get(typeOfMon[0]).add(monData[i].getTrueIndex());
+			typeHolder.get(typeOfMon[0].intIndex()).add(monData[i].getTrueIndex());
 			
 			if (typeOfMon[0] != typeOfMon[1]) // if dual-type
-				typeHolder.get(typeOfMon[1]).add(monData[i].getTrueIndex());
+				typeHolder.get(typeOfMon[1].intIndex()).add(monData[i].getTrueIndex());
 			
 			// concerning evo sorting
 			
@@ -139,8 +139,8 @@ class PokemonDataSorter
 		return this.byEvoLines;
 	}
 	
-	int[] getPokemonOfType(int n) // for one single type
+	int[] getPokemonOfType(Type type) // for one single type
 	{
-		return this.byType[n];
+		return this.byType[type.intIndex()];
 	}
 }

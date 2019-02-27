@@ -32,7 +32,7 @@ class RouteEditor
 				for (int j = 0; j < routes[i].getTotalSlots(); j++)
 				{
 					Pokemon initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeByte(j), mons);
-					routes[i].setPoke(j, monSorter.getSameTier(initialMon, -1, noLeg, false, false));
+					routes[i].setPoke(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, false));
 				}
 		}
 	}
@@ -45,7 +45,7 @@ class RouteEditor
 			{
 				if ((typeRoutes) && (routes[i].getLandIndex() == 1)) // is a water route
 				{
-					byte[] waterArray = monSorter.getPokemonOfType(10);
+					byte[] waterArray = monSorter.getPokemonOfType(Type.WATER);
 					for (int j = 0; j < routes[i].getNumberSpecies(); j++)
 						routes[i].setSlot(j, waterArray[(int) floor(random() * waterArray.length)]);
 				}
@@ -65,7 +65,7 @@ class RouteEditor
 					for (int j = 0; j < routes[i].getNumberSpecies(); j++)
 					{
 						Pokemon initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeSpeciesByte(j), mons);
-						routes[i].setSlot(j, monSorter.getSameTier(initialMon, 10, noLeg, false, false));
+						routes[i].setSlot(j, monSorter.getSameTier(initialMon, Type.WATER, noLeg, false, false));
 					}
 				}
 				else if ((typeRoutes) && (arrayContains(INDEX_ROUTE_SPECIFIC_TYPES[0], i))) // for Ice Path
@@ -89,7 +89,7 @@ class RouteEditor
 					for (int j = 0; j < routes[i].getNumberSpecies(); j++)
 					{
 						Pokemon initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeSpeciesByte(j), mons);
-						routes[i].setSlot(j, monSorter.getSameTier(initialMon, -1, noLeg, false, false));
+						routes[i].setSlot(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, false));
 					}
 				}
 			}

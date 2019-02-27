@@ -81,7 +81,7 @@ class TrainerEditor
 				newLvl[j] = lastLvl;
 				
 				int randTier = partyTiers[(int) floor(random() * size)]; // get a random tier from the original party
-				newParty[j] = monSorter.getSameTier(randTier, -1, -1, true, false, false);
+				newParty[j] = monSorter.getSameTier(randTier, -1, Type.NO_TYPE, true, false, false);
 
 				if (((kind >> 1) & 0x01) == (byte) 0x1) // has items
 					newItems[j] = (byte) 0x00; // no item
@@ -152,7 +152,7 @@ class TrainerEditor
 				if (withSimilar)
 				{
 					Pokemon initialMon = mons[byteToValue(trainers[i].getPokeByte(j)) - 1];
-					trainers[i].setPoke(j, monSorter.getSameTier(initialMon, -1, noLeg, false, false));
+					trainers[i].setPoke(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, false));
 				}
 				else
 				{
@@ -163,7 +163,7 @@ class TrainerEditor
 		
 		if (typeExpert != 0) // patch over type specialists
 		{
-			int[][] typeClassList = TRAINER_CLASS_TYPES; // get type list for trainer class
+			Type[][] typeClassList = TRAINER_CLASS_TYPES; // get type list for trainer class
 			
 			for (int i = 0; i < INDEX_TRAINER_CLASSES.length; i++) // cycle trainer classes
 			{
@@ -193,7 +193,7 @@ class TrainerEditor
 				}
 			}
 			
-			int[] typeList = (typeExpert == 1) ? getGymTypeList(false) : getGymTypeList(true); // get type list for gyms
+			Type[] typeList = (typeExpert == 1) ? GYM_TYPES : randomizeTypeList(GYM_TYPES); // get type list for gyms
 			
 			for (int i = 0; i < INDEX_GYM_TRAINERS.length; i++) // cycle gyms
 			{
@@ -218,7 +218,7 @@ class TrainerEditor
 					}
 			}
 			
-			typeList = (typeExpert == 1) ? getEliteTypeList(false) : getEliteTypeList(true); // get type list for Elite Four
+			typeList = (typeExpert == 1) ? ELITE_TYPES : randomizeTypeList(ELITE_TYPES); // get type list for Elite Four
 			
 			for (int i = 0; i < INDEX_ELITE_FOUR.length; i++) // cycle Elite Four
 			{
@@ -256,7 +256,7 @@ class TrainerEditor
 						byte[] prevMonArray = convertByteArray(prevMonList.toArray(new Byte[0]));
 						
 						Pokemon initialMon = mons[byteToValue(trainers[INDEX_MIXED_TRAINERS[i]].getPokeByte(j)) - 1];
-						randMon = monSorter.getSameTier(initialMon, -1, noLeg, false, true, prevMonArray);
+						randMon = monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, true, prevMonArray);
 						
 						trainers[INDEX_MIXED_TRAINERS[i]].setPoke(j, randMon);
 						prevMonList.add(randMon);
@@ -356,92 +356,46 @@ class TrainerEditor
 		return newMoves;
 	}
 	
-	private int[] getGymTypeList(boolean isRandom)
+	private Type[] randomizeTypeList(Type[] typeList)
 	{
-		int[] out = new int[GYM_TYPES.length]; // number of specialist gyms
+		Type[] out = new Type[typeList.length]; // number of specialist gyms
 		
-		if (!isRandom)
+		Type[] allTypes = new Type[N_TYPES];
+		int n = 0;
+
+		for (Type t : Type.values())
 		{
-			out = GYM_TYPES;
+			if (t == Type.NO_TYPE) continue;
+			allTypes[n] = t;
+			n++;
 		}
-		else
-		{
-			int[] allTypes = new int[N_TYPES];
-			for (int i = 0; i < N_TYPES; i++)
-				allTypes[i] = i;
-			
-			allTypes = shuffleArray(allTypes); // shuffle types
-			int nEqualities = 0;
-			ArrayList<Integer> equalIndex = new ArrayList<Integer>();
-			
-			for (int i = 0; i < GYM_TYPES.length; i++)
-				if (GYM_TYPES[i] == allTypes[i])
-				{
-					equalIndex.add(i);
-					nEqualities++;
-				}
-			
-			if (nEqualities > 0) // if we have gyms with unchanged types
+		
+		allTypes = shuffleArray(allTypes); // shuffle types
+		int nEqualities = 0;
+		ArrayList<Integer> equalIndex = new ArrayList<Integer>();
+		
+		for (int i = 0; i < typeList.length; i++)
+			if (typeList[i] == allTypes[i])
 			{
-				for (int i = 0; i < floor(nEqualities/2); i++) // cycle pairs
-				{
-					int typeHolder = allTypes[equalIndex.get(2*i)];
-					allTypes[equalIndex.get(i)] = allTypes[equalIndex.get(2*i+1)];
-					allTypes[equalIndex.get(2*i+1)] = typeHolder;
-				}
-				
-				if (nEqualities % 2 == 1) // if there's one without pair, switch it with an unused type
-					allTypes[equalIndex.get(equalIndex.size()-1)] = allTypes[allTypes.length-1];
+				equalIndex.add(i);
+				nEqualities++;
+			}
+		
+		if (nEqualities > 0) // if we have gyms with unchanged types
+		{
+			for (int i = 0; i < floor(nEqualities/2); i++) // cycle pairs
+			{
+				Type typeHolder = allTypes[equalIndex.get(2*i)];
+				allTypes[equalIndex.get(i)] = allTypes[equalIndex.get(2*i+1)];
+				allTypes[equalIndex.get(2*i+1)] = typeHolder;
 			}
 			
-			for (int i = 0; i < out.length; i++)
-				out[i] = allTypes[i];
+			if (nEqualities % 2 == 1) // if there's one without pair, switch it with an unused type
+				allTypes[equalIndex.get(equalIndex.size()-1)] = allTypes[allTypes.length-1];
 		}
 		
-		return out;
-	}
-	
-	private int[] getEliteTypeList(boolean isRandom)
-	{
-		int[] out = new int[ELITE_TYPES.length]; // number of Elite
-		
-		if (!isRandom)
-		{
-			out = ELITE_TYPES;
-		}
-		else
-		{
-			int[] allTypes = new int[N_TYPES];
-			for (int i = 0; i < N_TYPES; i++)
-				allTypes[i] = i;
-			
-			allTypes = shuffleArray(allTypes); // shuffle types
-			int nEqualities = 0;
-			ArrayList<Integer> equalIndex = new ArrayList<Integer>();
-			
-			for (int i = 0; i < ELITE_TYPES.length; i++)
-				if (ELITE_TYPES[i] == allTypes[i])
-				{
-					equalIndex.add(i);
-					nEqualities++;
-				}
-			
-			if (nEqualities > 0) // if we have Elite with unchanged types
-			{
-				for (int i = 0; i < floor(nEqualities/2); i++) // cycle pairs
-				{
-					int typeHolder = allTypes[equalIndex.get(2*i)];
-					allTypes[equalIndex.get(i)] = allTypes[equalIndex.get(2*i+1)];
-					allTypes[equalIndex.get(2*i+1)] = typeHolder;
-				}
-				
-				if (nEqualities % 2 == 1) // if there's one without pair, switch it with an unused type
-					allTypes[equalIndex.get(equalIndex.size()-1)] = allTypes[allTypes.length-1];
-			}
-			
-			for (int i = 0; i < out.length; i++)
-				out[i] = allTypes[i];
-		}
+		for (int i = 0; i < out.length; i++)
+			out[i] = allTypes[i];
 		
 		return out;
 	}

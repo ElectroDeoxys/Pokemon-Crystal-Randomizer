@@ -65,7 +65,7 @@ class SavePatcher
 		for (int i = 0; i < nMons; i++) // cycle party
 		{
 			byte[] prevMonArray = convertByteArray(prevMonList.toArray(new Byte[0]));
-			monTeamByte[i] = monSorter.getSameTier(monTeam[i], -1, false, false, true, prevMonArray);
+			monTeamByte[i] = monSorter.getSameTier(monTeam[i], Type.NO_TYPE, false, false, true, prevMonArray);
 			prevMonList.add(monTeamByte[i]);
 		}
 		
