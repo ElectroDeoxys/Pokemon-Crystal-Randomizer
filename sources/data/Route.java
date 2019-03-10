@@ -119,9 +119,9 @@ public class Route
 	}
 	
 	// set Pokemon data individually
-	public void setPoke(int n, byte pokeIndex)
+	public void setPoke(int n, int pokeIndex)
 	{
-		this.poke[n] = pokeIndex;
+		this.poke[n] = valueToByte(pokeIndex);
 	}
 	
 	public void setLvl(int n, byte lvl)
@@ -141,12 +141,12 @@ public class Route
 	}
 	
 	// set Pokemon in slots
-	public void setSlot(int pokeSlotPos, byte pokeIndex)
+	public void setSlot(int pokeSlotPos, int pokeIndex)
 	{
-		this.pokeList[pokeSlotPos] = pokeIndex; // substitute it in the species list
+		this.pokeList[pokeSlotPos] = valueToByte(pokeIndex); // substitute it in the species list
 		
 		for (int i = 0; i < this.pokeSlot[pokeSlotPos].length; i++) // loop through the slots of this Pokemon in the list
-			this.poke[pokeSlot[pokeSlotPos][i]] = pokeIndex; // substitute each position listed for this species
+			this.poke[pokeSlot[pokeSlotPos][i]] = valueToByte(pokeIndex); // substitute each position listed for this species
 	}
 	
 	public int getLandIndex() // decide if this route is land or water

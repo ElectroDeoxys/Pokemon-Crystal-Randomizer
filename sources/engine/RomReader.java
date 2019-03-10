@@ -9,7 +9,7 @@ import java.io.IOException;
 import static data.Constants.*;
 import data.Route;
 import data.Trainer;
-import data.Pokemon;
+import data.PokemonGame;
 import data.Move;
 import data.Sprite;
 
@@ -199,9 +199,9 @@ class RomReader
 		return trainers;
 	}
 	
-	Pokemon[] readRomPokemon() throws IOException
+	PokemonGame[] readRomPokemon() throws IOException
 	{
-		Pokemon[] mons = new Pokemon[N_POKEMON];
+		PokemonGame[] mons = new PokemonGame[N_POKEMON];
 		
 		int thisOffset2 = OFFSET_POKEMON_2; // for keeping track of the offsets in the second set
 		
@@ -224,7 +224,7 @@ class RomReader
 				hasPre = true;
 			}
 			
-			int pos = Pokemon.convertIndexToOffset(i);
+			int pos = PokemonGame.convertIndexToOffset(i);
 			pos++;
 			
 			byte[] base = readFromRom(ch, pos, 6); // read base stats
@@ -319,7 +319,7 @@ class RomReader
 			
 			thisOffset2 = pos + 1; // setting the next offset
 			
-			mons[i] = new Pokemon(i, i+1, base, type, misc, gfx, tmhm, evoArray, moveArray);
+			mons[i] = new PokemonGame(i, i+1, base, type, misc, gfx, tmhm, evoArray, moveArray);
 			
 			if (hasPre)
 				mons[i].setPreEvo(preEvoIndex);
@@ -362,7 +362,7 @@ class RomReader
 				
 				for (int j = 0; j < evo.length; j++) // cycle all evolutions
 				{
-					Pokemon evoMon = mons[byteToValue(evo[j][evo[j].length - 1]) - 1];
+					PokemonGame evoMon = mons[byteToValue(evo[j][evo[j].length - 1]) - 1];
 					evoMon.setEggMovesCarry(eggMoveArray);
 					
 					if (evoMon.hasEvos()) // if that Pokemon has evos too, set their egg moves as well
@@ -371,7 +371,7 @@ class RomReader
 				
 						for (int k = 0; k < evo2.length; k++) // cycle all evolutions
 						{
-							Pokemon evoMon2 = mons[byteToValue(evo2[k][evo2[k].length - 1]) - 1];
+							PokemonGame evoMon2 = mons[byteToValue(evo2[k][evo2[k].length - 1]) - 1];
 							evoMon2.setEggMovesCarry(eggMoveArray);
 						}
 					}

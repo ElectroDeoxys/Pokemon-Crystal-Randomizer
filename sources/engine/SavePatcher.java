@@ -10,7 +10,7 @@ import static data.Constants.*;
 import static engine.RomReader.*;
 import static engine.RomWriter.*;
 
-import data.Pokemon;
+import data.PokemonGame;
 
 class SavePatcher
 {
@@ -43,11 +43,11 @@ class SavePatcher
 		}
 	}
 	
-	void generateTeam(PokemonSorter monSorter, MoveSorter moveSorter, Pokemon[] mons, int nMons, int lvl) throws IOException
+	void generateTeam(PokemonSorter monSorter, MoveSorter moveSorter, PokemonGame[] mons, int nMons, int lvl) throws IOException
 	{
 		// generates a nMons-party team with specified level
-		Pokemon[] monTeam = new Pokemon[nMons];
-		byte[] monTeamByte = new byte[nMons];
+		PokemonGame[] monTeam = new PokemonGame[nMons];
+		int[] monTeamInt = new int[nMons];
 		
 		// create dummy Pokemon team with random tiers
 		for (int i = 0; i < nMons; i++)
@@ -56,34 +56,34 @@ class SavePatcher
 			for (int j = 0; j < tmhmByte.length; j++)
 				tmhmByte[j] = (byte) 0x00; // placeholder tmhm bytes
 			
-			monTeam[i] = new Pokemon(0, (byte) 0xFF, new byte[0], new byte[0], new byte[0], (byte) 0x00, tmhmByte, new byte[0][0], new byte[0][0]);
+			monTeam[i] = new PokemonGame(0, (byte) 0xFF, new byte[0], new byte[0], new byte[0], (byte) 0x00, tmhmByte, new byte[0][0], new byte[0][0]);
 			monTeam[i].setOldTier((int) floor(random() * (N_TIERS - 1)));
 		}
 		
-		ArrayList<Byte> prevMonList = new ArrayList<Byte>(); // keep track of previous Pokemon in team
+		ArrayList<Integer> prevMonList = new ArrayList<Integer>(); // keep track of previous Pokemon in team
 					
 		for (int i = 0; i < nMons; i++) // cycle party
 		{
-			byte[] prevMonArray = convertByteArray(prevMonList.toArray(new Byte[0]));
-			monTeamByte[i] = monSorter.getSameTier(monTeam[i], Type.NO_TYPE, false, false, true, prevMonArray);
-			prevMonList.add(monTeamByte[i]);
+			int[] prevMonArray = convertIntArray(prevMonList.toArray(new Integer[0]));
+			monTeamInt[i] = monSorter.getSameTier(monTeam[i], Type.NO_TYPE, false, false, true, prevMonArray);
+			prevMonList.add(monTeamInt[i]);
 		}
 		
 		int[] lvlL = new int[nMons];
 		for (int i = 0; i < lvlL.length; i++)
 			lvlL[i] = lvl;
-		monTeamByte = monSorter.evolveTeam(monTeamByte, lvlL);
+		monTeamInt = monSorter.evolveTeam(monTeamInt, lvlL);
 		
 		// apply moveset
 		byte[][] moves = new byte[nMons][4];
 		for (int i = 0; i < nMons; i++)
-			moves[i] = monSorter.getMoveset(moveSorter, monTeamByte[i], valueToByte(lvl), true);
+			moves[i] = monSorter.getMoveset(moveSorter, monTeamInt[i], valueToByte(lvl), true);
 		
 		// create team for saving		
 		SaveMon[] savMon = new SaveMon[nMons];
 		
 		for (int i = 0; i < nMons; i++)
-			savMon[i] = new SaveMon(monTeamByte[i], (byte) 0x00, moves[i], mons[byteToValue(monTeamByte[i]) - 1].getTotalExp(lvl), lvl);
+			savMon[i] = new SaveMon(valueToByte(monTeamInt[i]), (byte) 0x00, moves[i], mons[monTeamInt[i] - 1].getTotalExp(lvl), lvl);
 		
 		writeTeam(savMon);
 	}

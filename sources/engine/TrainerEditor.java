@@ -6,15 +6,15 @@ import static java.lang.Math.*;
 
 import static data.Constants.*;
 import data.Trainer;
-import data.Pokemon;
+import data.PokemonGame;
 
 class TrainerEditor
 {
 	private Trainer[] trainers;
-	private Pokemon[] mons;
+	private PokemonGame[] mons;
 	private PokemonSorter monSorter;
 	
-	TrainerEditor(RomReader romReader, Pokemon[] mons) throws IOException
+	TrainerEditor(RomReader romReader, PokemonGame[] mons) throws IOException
 	{
 		this.trainers = romReader.readRomTrainers();
 		this.mons = mons;
@@ -40,7 +40,7 @@ class TrainerEditor
 			
 			int newSize = (int) min(size + floor(random() * 3), 6);
 			int[] newLvl = new int[newSize];
-			byte[] newParty = new byte[newSize];
+			int[] newParty = new int[newSize];
 			byte[] newItems = new byte[newSize];
 			byte[][] newMoves = new byte[newSize][4];
 			
@@ -50,10 +50,10 @@ class TrainerEditor
 				
 				lvl[j] = (int) min((byteToValue(b[0]) + 15), 100);
 				party[j] = b[1];
-				partyTiers[j] = monSorter.getPokemonOldTier(party[j], false);
+				partyTiers[j] = monSorter.getPokemonOldTier(byteToValue(party[j]), false);
 				
 				newLvl[j] = lvl[j];
-				newParty[j] = party[j];
+				newParty[j] = byteToValue(party[j]);
 				
 				int a = 0; // keep track of indexes to look into
 				
@@ -96,7 +96,7 @@ class TrainerEditor
 			{
 				ArrayList<Byte> slotList = new ArrayList<Byte>();
 				slotList.add(valueToByte(newLvl[j]));
-				slotList.add(newParty[j]);
+				slotList.add(valueToByte(newParty[j]));
 				
 				if (((kind >> 1) & 0x01) == (byte) 0x1) // has items
 					slotList.add(newItems[j]);
@@ -128,7 +128,7 @@ class TrainerEditor
 				lvls[j] = byteToValue(trainers[i].getLvl(j));
 			}
 			
-			byte[] newParty = monSorter.evolveTeam(party, lvls);
+			byte[] newParty = valueToByte(monSorter.evolveTeam(byteToValue(party), lvls));
 			
 			for (int j = 0; j < size; j++) // set the trainer bytes
 				trainers[i].setPoke(j, newParty[j]);
@@ -151,7 +151,7 @@ class TrainerEditor
 			{
 				if (withSimilar)
 				{
-					Pokemon initialMon = mons[byteToValue(trainers[i].getPokeByte(j)) - 1];
+					PokemonGame initialMon = mons[byteToValue(trainers[i].getPokeByte(j)) - 1];
 					trainers[i].setPoke(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, false));
 				}
 				else
@@ -167,7 +167,7 @@ class TrainerEditor
 			
 			for (int i = 0; i < INDEX_TRAINER_CLASSES.length; i++) // cycle trainer classes
 			{
-				byte[] monsOfType = monSorter.getPokemonOfType(typeClassList[i]);
+				int[] monsOfType = monSorter.getPokemonOfType(typeClassList[i]);
 				
 				for (int j = INDEX_TRAINER_CLASSES[i][0]; j <= INDEX_TRAINER_CLASSES[i][1]; j++) // cycle trainers
 				{
@@ -176,11 +176,11 @@ class TrainerEditor
 					
 					for (int k = 0; k < trainers[j].getPartySize(); k++) // cycle party
 					{
-						byte randMon;
+						int randMon;
 						
 						if (withSimilar)
 						{
-							Pokemon initialMon = mons[byteToValue(trainers[j].getPokeByte(k)) - 1];
+							PokemonGame initialMon = mons[byteToValue(trainers[j].getPokeByte(k)) - 1];
 							randMon = monSorter.getSameTier(initialMon, typeClassList[i], noLeg);
 						}
 						else
@@ -197,16 +197,16 @@ class TrainerEditor
 			
 			for (int i = 0; i < INDEX_GYM_TRAINERS.length; i++) // cycle gyms
 			{
-				byte[] monsOfType = monSorter.getPokemonOfType(typeList[i]);
+				int[] monsOfType = monSorter.getPokemonOfType(typeList[i]);
 				
 				for (int j = 0; j < INDEX_GYM_TRAINERS[i].length; j++) // cycle trainers
 					for (int k = 0; k < trainers[INDEX_GYM_TRAINERS[i][j]].getPartySize(); k++) // cycle party
 					{
-						byte randMon;
+						int randMon;
 						
 						if (withSimilar)
 						{
-							Pokemon initialMon = mons[byteToValue(trainers[INDEX_GYM_TRAINERS[i][j]].getPokeByte(k)) - 1];
+							PokemonGame initialMon = mons[byteToValue(trainers[INDEX_GYM_TRAINERS[i][j]].getPokeByte(k)) - 1];
 							randMon = monSorter.getSameTier(initialMon, typeList[i], noLeg, false, false);
 						}
 						else
@@ -222,15 +222,15 @@ class TrainerEditor
 			
 			for (int i = 0; i < INDEX_ELITE_FOUR.length; i++) // cycle Elite Four
 			{
-				byte[] monsOfType = monSorter.getPokemonOfType(typeList[i]);
+				int[] monsOfType = monSorter.getPokemonOfType(typeList[i]);
 				
 				for (int j = 0; j < trainers[INDEX_ELITE_FOUR[i]].getPartySize(); j++) // cycle party
 				{
-					byte randMon;
+					int randMon;
 					
 					if (withSimilar)
 					{
-						Pokemon initialMon = mons[byteToValue(trainers[INDEX_ELITE_FOUR[i]].getPokeByte(j)) - 1];
+						PokemonGame initialMon = mons[byteToValue(trainers[INDEX_ELITE_FOUR[i]].getPokeByte(j)) - 1];
 						randMon = monSorter.getSameTier(initialMon, typeList[i], noLeg, false, false);
 					}
 					else
@@ -248,14 +248,14 @@ class TrainerEditor
 				
 				for (int i = 0; i < INDEX_MIXED_TRAINERS.length; i++) // cycle mixed Trainers
 				{
-					ArrayList<Byte> prevMonList = new ArrayList<Byte>(); // keep track of previous Pokemon in team
+					ArrayList<Integer> prevMonList = new ArrayList<Integer>(); // keep track of previous Pokemon in team
 					
 					for (int j = 0; j < trainers[INDEX_MIXED_TRAINERS[i]].getPartySize(); j++) // cycle party
 					{
-						byte randMon;
-						byte[] prevMonArray = convertByteArray(prevMonList.toArray(new Byte[0]));
+						int randMon;
+						int[] prevMonArray = convertIntArray(prevMonList.toArray(new Integer[0]));
 						
-						Pokemon initialMon = mons[byteToValue(trainers[INDEX_MIXED_TRAINERS[i]].getPokeByte(j)) - 1];
+						PokemonGame initialMon = mons[byteToValue(trainers[INDEX_MIXED_TRAINERS[i]].getPokeByte(j)) - 1];
 						randMon = monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, true, prevMonArray);
 						
 						trainers[INDEX_MIXED_TRAINERS[i]].setPoke(j, randMon);
@@ -266,7 +266,7 @@ class TrainerEditor
 				if (persRival) // handle persistent Rival team
 				{
 					int[][][] levels = new int[INDEX_RIVAL.length][RIVAL_PARTY_SIZES.length][];
-					byte[][] finalRivalTeam = new byte[INDEX_RIVAL.length][RIVAL_PARTY_SIZES[RIVAL_PARTY_SIZES.length - 1]];
+					int[][] finalRivalTeam = new int[INDEX_RIVAL.length][RIVAL_PARTY_SIZES[RIVAL_PARTY_SIZES.length - 1]];
 					
 					// collect Rival team data
 					for (int i = 0; i < INDEX_RIVAL.length; i++) // cycle starters
@@ -279,11 +279,11 @@ class TrainerEditor
 								levels[i][j][k] = byteToValue(trainers[INDEX_RIVAL[i][j]].getLvl(k));
 								
 								if (j == RIVAL_PARTY_SIZES.length - 1) // if it's the final battle
-									finalRivalTeam[i][k] = trainers[INDEX_RIVAL[i][j]].getPokeByte(k);
+									finalRivalTeam[i][k] = byteToValue(trainers[INDEX_RIVAL[i][j]].getPokeByte(k));
 							}
 						}
 								
-					byte[][][] rivalTeams = monSorter.generateRivalTeams(finalRivalTeam, levels, noLeg); //[Starter index][Battle number][Pokemon party]
+					int[][][] rivalTeams = monSorter.generateRivalTeams(finalRivalTeam, levels, noLeg); //[Starter index][Battle number][Pokemon party]
 
 					for (int i = 0; i < rivalTeams.length; i++) // cycle starters
 						for (int j = 0; j < rivalTeams[i].length; j++) // cycle battles
@@ -325,15 +325,15 @@ class TrainerEditor
 			for (int j = 0; j < trainers[i].getPartySize(); j++)
 			{
 				byte lvl = trainers[i].getLvl(j);
-				byte[] newMoves = getMoveset(moveSorter, trainers[i].getPokeByte(j), lvl, extraCust);
+				byte[] newMoves = getMoveset(moveSorter, byteToValue(trainers[i].getPokeByte(j)), lvl, extraCust);
 				trainers[i].setMoves(j, newMoves);
 			}
 		}
 	}
 	
-	byte[] getMoveset(MoveSorter moveSorter, byte monByte, byte lvl, boolean extraCust)
+	byte[] getMoveset(MoveSorter moveSorter, int monInt, byte lvl, boolean extraCust)
 	{
-		int thisMon = byteToValue(monByte) - 1;
+		int thisMon = monInt - 1;
 		byte[] lvlMoves = mons[thisMon].getMovesUpToLevel(lvl);
 		byte[] newMoves = new byte[4];
 
@@ -479,7 +479,7 @@ class TrainerEditor
 	{
 		Trainer t = trainers[n];
 
-		System.out.println("~~ " + names.trainer(n) + " ~~");
+		System.out.println("~~~ " + names.trainer(n) + " ~~~");
 		for (int i = 0; i < t.getPartySize(); i++)
 		{
 			byte[] b = t.getPokeBytes(i);

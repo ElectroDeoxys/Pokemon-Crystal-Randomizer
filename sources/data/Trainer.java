@@ -95,9 +95,9 @@ public class Trainer
 		this.statExp = statExp;
 	}
 	
-	public void setPoke(int partyPos, byte pokeIndex)
+	public void setPoke(int partyPos, int pokeIndex)
 	{
-		this.party[partyPos][1] = pokeIndex;
+		this.party[partyPos][1] = valueToByte(pokeIndex);
 	}
 	
 	public void setLvl(int partyPos, byte lvl)

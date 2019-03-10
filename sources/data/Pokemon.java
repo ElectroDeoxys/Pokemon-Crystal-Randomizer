@@ -5,74 +5,45 @@ import static java.lang.Math.*;
 
 import static data.Constants.*;
 
-public class Pokemon
+public abstract class Pokemon
 {
-	private int index; // in-game index of Pokemon
-	private int trueIndex; // national index of Pokemon
-	private byte[] base = new byte[6]; // base stats (hp, atk, def, spd, sat, sdf)
-	private byte[] typeByte = new byte[2];
+	protected int trueIndex; // national index of Pokemon
+
+	protected byte[] base = new byte[6]; // base stats (hp, atk, def, spd, sat, sdf)
+	protected byte[] typeByte = new byte[2];
 	
 	// misc data (catch rate, base exp, item1, item2, gender ratio, 
 	// egg steps, growth rate, egg group)
-	private byte[] misc = new byte[8];
+	protected byte[] misc = new byte[8];
 	
-	private byte gfx;
-	private byte[] tmhmByte; // TM/HM compatibility
+	protected byte gfx;
+	protected byte[] tmhmByte; // TM/HM compatibility
 	
-	private byte[][] evo; // [evo number][method, method parameter(s), species index]
-	private byte[][] move; // [move number][level, move index]
-	private byte[] eggMove;
-	private byte[] eggMoveCarry; // egg moves that it can carry from itself or pre-evolutions
+	protected byte[][] evo; // [evo number][method, method parameter(s), species index]
+	protected byte[][] move; // [move number][level, move index]
+	protected byte[] eggMove;
+	protected byte[] eggMoveCarry; // egg moves that it can carry from itself or pre-evolutions
 	
-	private int tier = 0; // tier list to compare strengths
-	private int typeTier = 0; // tier list to compare strengths for same type
-	private boolean[] tmhmComp = new boolean[N_TM + N_HM + N_MOVE_TUTOR];
+	protected int tier = 0; // tier list to compare strengths
+	protected int typeTier = 0; // tier list to compare strengths for same type
 	
-	private byte[] preEvo = new byte[0]; // lists pre-evolution
-	private byte[] name;
-	private byte icon;
-	
-	private int oldTier = -1; // tier list to compare strengths from Pokemon it replaced in the old Pokedex
-	private int oldTypeTier = -1; // tier list to compare strengths for same type from Pokemon it replaced in the old Pokedex
+	protected byte[] preEvo = new byte[0]; // lists pre-evolution
+	protected byte[] name;
+	protected byte icon;
 
-	private Type[] types = new Type[2];	
+	protected Type[] types = new Type[2];
+
+	protected boolean[] tmhmComp = new boolean[N_TM + N_HM + N_MOVE_TUTOR];
 	
-	public Pokemon(int index, int trueIndex, byte[] base, byte[] typeByte, byte[] misc, byte gfx, byte[] tmhmByte, byte[][] evo, byte[][] move)
-	{
-		this.index = index;
-		this.trueIndex = trueIndex;
-		
-		this.base = base;
-		this.typeByte = typeByte;
-		this.misc = misc;
-		this.gfx = gfx;
-		this.tmhmByte = tmhmByte;
-		
-		this.evo = evo;
-		this.move = move;
-		
-		this.eggMove = new byte[0]; // initialize egg moves
-		this.eggMoveCarry = new byte[0];
-		
-		convertCompatibilities();
-		resolveType();
-	}
+	protected int oldTier = -1; // tier list to compare strengths from Pokemon it replaced in the old Pokedex
+	protected int oldTypeTier = -1; // tier list to compare strengths for same type from Pokemon it replaced in the old Pokedex
 	
 	/////////////////////////////////////////////
 	// Return value methods
 	/////////////////////////////////////////////
 	
-	public byte getIndex()
-	{
-		byte out = (byte) (this.index + 0x1);
-		return out;
-	}
-	
-	public int getIntIndex()
-	{
-		return this.index + 1;
-	}
-	
+	public abstract int getIntIndex();
+
 	public int getTrueIndex()
 	{
 		return this.trueIndex;
@@ -119,6 +90,8 @@ public class Pokemon
 	{
 		return this.evo;
 	}
+
+	abstract public int[] getEvoInt();
 	
 	public byte[][] getMoves()
 	{
@@ -139,6 +112,8 @@ public class Pokemon
 	{
 		return preEvo;
 	}
+
+	abstract public int[] getPreEvoInt();
 	
 	public byte[] getEggMoves()
 	{
@@ -148,16 +123,6 @@ public class Pokemon
 	public byte[] getEggMovesCarry()
 	{
 		return this.eggMoveCarry;
-	}
-	
-	public int getOffset1() // offset to first set of data (base stats)
-	{
-		return convertIndexToOffset(this.index);
-	}	
-	
-	public static int convertIndexToOffset(int n)
-	{
-		return OFFSET_POKEMON_1 + 0x20 * n; // offset to first set of data (base stats)
 	}
 	
 	public int getNBytes() // get number of bytes from all moves and evolutions 
@@ -192,6 +157,26 @@ public class Pokemon
 		return this.typeTier;
 	}
 	
+	public boolean isLegendary()
+	{
+		boolean out = false; // assume it isn't legendary
+		
+		if ((this.getBST() >= LEGENDARY_BST) && !(this.hasPre()))
+			out = true;
+		
+		return out;
+	}
+	
+	public byte[] getName()
+	{
+		return this.name;
+	}
+	
+	public byte getIcon()
+	{
+		return this.icon;
+	}
+
 	public boolean[] getCompatibilities()
 	{
 		return this.tmhmComp;
@@ -240,21 +225,6 @@ public class Pokemon
 		return convertByteArray(movesOut.toArray(new Byte[0]));
 	}
 	
-	public boolean isLegendary()
-	{
-		boolean out = false; // assume it isn't legendary
-		
-		if ((this.getBST() >= LEGENDARY_BST) && !(this.hasPre()))
-			out = true;
-		
-		return out;
-	}
-	
-	public byte[] getName()
-	{
-		return this.name;
-	}
-	
 	public int getOldTier()
 	{
 		return this.oldTier;
@@ -263,11 +233,6 @@ public class Pokemon
 	public int getOldTypeTier()
 	{
 		return this.oldTypeTier;
-	}
-	
-	public byte getIcon()
-	{
-		return this.icon;
 	}
 	
 	public int getTotalExp(int lvl)
@@ -324,21 +289,8 @@ public class Pokemon
 	{
 		this.move = moves;
 	}
-	
-	private void convertCompatibilities()
-	{
-		for (int i = 0; i < tmhmComp.length; i++)
-		{
-			byte thisBit = getBit(tmhmByte[(int) floor(i/8)], i % 8);
 
-			if (thisBit == 0)
-				tmhmComp[i] = false;
-			else
-				tmhmComp[i] = true;
-		}
-	}
-
-	private void resolveType()
+	protected void resolveType()
 	{
 		for (int i = 0; i < typeByte.length; i++)
 		{
@@ -349,11 +301,6 @@ public class Pokemon
 	        		break;
 	        	}
 		}
-	}
-	
-	public void setCompatibility(int n, boolean isCompatible)
-	{
-		this.tmhmComp[n] = isCompatible;
 	}
 	
 	public void setPreEvo(byte[] preEvoIndex)
@@ -381,16 +328,6 @@ public class Pokemon
 		this.typeTier = typeTier;
 	}
 	
-	public void setOldTier(int oldTier)
-	{
-		this.oldTier = oldTier;
-	}
-	
-	public void setOldTypeTier(int oldTypeTier)
-	{
-		this.oldTypeTier = oldTypeTier;
-	}
-	
 	public void setName(byte[] name)
 	{
 		this.name = name;
@@ -399,5 +336,15 @@ public class Pokemon
 	public void setIcon(byte icon)
 	{
 		this.icon = icon;
+	}
+
+	public void setOldTier(int oldTier)
+	{
+		this.oldTier = oldTier;
+	}
+	
+	public void setOldTypeTier(int oldTypeTier)
+	{
+		this.oldTypeTier = oldTypeTier;
 	}
 }

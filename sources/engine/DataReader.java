@@ -233,7 +233,7 @@ class DataReader
 					{
 						int[] preEvoByte = new int[1];
 						preEvoIndex[0] = curIndex;
-						monData[evoIndex - 1].setPreEvo(preEvoIndex);
+						monData[evoIndex - 1].setPreEvoIndex(preEvoIndex);
 					}
 					else // check afterwards to determine it's an evolution form and give it the index
 					{
@@ -272,7 +272,7 @@ class DataReader
 			monData[i] = new PokemonData(curIndex, base, type, misc, gfx, tmhm, evoArray, evoIndexArray, moveArray);
 			
 			if (hasPre)
-				monData[i].setPreEvo(preEvoIndex);
+				monData[i].setPreEvoIndex(preEvoIndex);
 			
 			/////////////////////////////////////
 			// names
@@ -323,7 +323,7 @@ class DataReader
 			
 			if (monData[i].hasEvos()) // check the evolutions of this Pokemon to pass on the egg moves
 			{
-				int[] evoIndex = monData[i].getEvoIndexes();
+				int[] evoIndex = monData[i].getEvoIndex();
 				
 				for (int j = 0; j < evoIndex.length; j++) // cycle all evolutions
 				{
@@ -332,7 +332,7 @@ class DataReader
 					
 					if (evoMon.hasEvos()) // if that Pokemon has evos too, set their egg moves as well
 					{
-						int[] evoIndex2 = monData[evoIndex[j] - 1].getEvoIndexes();
+						int[] evoIndex2 = monData[evoIndex[j] - 1].getEvoIndex();
 				
 						for (int k = 0; k < evoIndex2.length; k++) // cycle all evolutions
 						{

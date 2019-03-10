@@ -8,7 +8,7 @@ import java.io.IOException;
 import static data.Constants.*;
 import data.Route;
 import data.Trainer;
-import data.Pokemon;
+import data.PokemonGame;
 import data.Move;
 import data.Sprite;
 
@@ -46,7 +46,7 @@ class RomWriter
 	
 	void randomizeStarters(PokemonSorter monSorter, int starterKind) throws IOException
 	{
-		byte[] str = monSorter.getRandomStarters(starterKind); // array with the new starters
+		byte[] str = valueToByte(monSorter.getRandomStarters(starterKind)); // array with the new starters
 		
 		for (int i = 0; i < 3; i ++)
 			for (int pos : OFFSET_STARTERS[i])
@@ -119,7 +119,7 @@ class RomWriter
 		}
 	}	
 	
-	void replaceAllPokemon(Pokemon[] mons) throws IOException
+	void replaceAllPokemon(PokemonGame[] mons) throws IOException
 	{
 		int pos1 = OFFSET_POKEMON_2; // keep track of positions evo/moves
 		int pos2 = OFFSET_POKEMON_3; // keep track of position egg moves

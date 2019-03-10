@@ -94,7 +94,7 @@ class Main
 			romWriter.replaceAllSprites(spriteEditor.getAllSprites(), spriteEditor.getAllTrainerSprites(), spriteEditor.getEggSprite(), spriteEditor.getAllPalettes());
 			
 			Names names = new Names(monEditor.getAllPokemon(), trainerEditor.getTrainers(), moveEditor.getMoves());
-			PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), romReader.readRomStarters());
+			PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), romReader.readRomStarters(), names);
 			
 			romWriter.randomizeStarters(monSorter, starterKind);
 			

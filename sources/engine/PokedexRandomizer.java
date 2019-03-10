@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import static data.Constants.*;
 import data.PokemonData;
-import data.Pokemon;
+import data.PokemonGame;
 import data.Sprite;
 
 class PokedexRandomizer
@@ -15,7 +15,7 @@ class PokedexRandomizer
 	private byte[][][] palData;
 	
 	private int[] dexArray;
-	private Pokemon[] mons;
+	private PokemonGame[] mons;
 	private Sprite[][] monSpr;
 	private byte[][][] pal;
 	
@@ -44,8 +44,8 @@ class PokedexRandomizer
 		ArrayList<Integer> dexList = new ArrayList<Integer>();
 		ArrayList<Integer> evoList = new ArrayList<Integer>();
 		
-		PokemonDataSorter monDataSorter = new PokemonDataSorter(monData);
-		int[][] evoLines = monDataSorter.getEvoLines();
+		PokemonSorter monSorter = new PokemonSorter(monData);
+		int[][] evoLines = monSorter.getEvoLines();
 		int nEvos = evoLines.length;
 		int nDexEvos = 0; // number of evolution lines in the Pokedex
 		int nDexMons = 0;
@@ -55,7 +55,7 @@ class PokedexRandomizer
 		{
 			if (t == Type.NO_TYPE) continue;
 			
-			evoList.add(getRandomEvoLineType(monDataSorter, t, evoList));
+			evoList.add(getRandomEvoLineType(monSorter, t, evoList));
 			
 			for (int j = 0; j < evoLines[evoList.get(t.intIndex())].length; j++)
 				nDexMons++;
@@ -108,24 +108,24 @@ class PokedexRandomizer
 		return randEvoLine;
 	}
 	
-	private int getRandomEvoLineType(PokemonDataSorter monDataSorter, Type type, ArrayList<Integer> curEvoList)
+	private int getRandomEvoLineType(PokemonSorter monSorter, Type type, ArrayList<Integer> curEvoList)
 	{
 		// returns a random evolution line that has given type with no repeats
-		int[] typeArray = monDataSorter.getPokemonOfType(type);
+		int[] typeArray = monSorter.getPokemonOfType(type);
 		int randEvoLine;
 		
 		do
 		{
 			int randMon = typeArray[(int) floor(random() * typeArray.length)];
-			randEvoLine = monDataSorter.findEvoLineContaining(randMon);
+			randEvoLine = monSorter.findEvoLineContaining(randMon);
 		} while (curEvoList.contains(randEvoLine));
 		
 		return randEvoLine;
 	}
 	
-	private Pokemon[] getPokemonArray()
+	private PokemonGame[] getPokemonArray()
 	{
-		Pokemon[] mons = new Pokemon[dexArray.length];
+		PokemonGame[] mons = new PokemonGame[dexArray.length];
 		
 		for (int i = 0; i < dexArray.length; i++)
 		{
@@ -136,12 +136,13 @@ class PokedexRandomizer
 			if (monData[curIndex - 1].hasEvos())
 			{
 				byte[][] evo = monData[curIndex - 1].getEvos();
-				int[] evoIndex = monData[curIndex - 1].getEvoIndexes();
+				int[] evoIndex = monData[curIndex - 1].getEvoIndex();
 				
 				newEvo = new byte[evo.length][];
-			
+
 				for (int j = 0; j < newEvo.length; j++) // fill in evolution bytes accordingly
 				{
+
 					newEvo[j] = new byte[evo[j].length + 1];
 					for (int k = 0; k < evo[j].length; k++)
 						newEvo[j][k] = evo[j][k];
@@ -157,7 +158,7 @@ class PokedexRandomizer
 			
 			if (monData[curIndex - 1].hasPre())
 			{
-				int[] preEvo = monData[curIndex - 1].getPreEvo();
+				int[] preEvo = monData[curIndex - 1].getPreEvoIndex();
 				newPreEvo = new byte[1];
 				newPreEvo[0] = valueToByte(indexLookup[preEvo[0]]);
 			}
@@ -208,7 +209,7 @@ class PokedexRandomizer
 		return pal;
 	}
 	
-	Pokemon[] getAllPokemon()
+	PokemonGame[] getAllPokemon()
 	{
 		return mons;
 	}

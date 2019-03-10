@@ -5,11 +5,11 @@ import java.io.IOException;
 import static java.lang.Math.*;
 
 import static data.Constants.*;
-import data.Pokemon;
+import data.PokemonGame;
 
 class PokemonEditor
 {
-	private Pokemon[] mons;
+	private PokemonGame[] mons;
 	
 	PokemonEditor(RomReader romReader) throws IOException
 	{
@@ -151,7 +151,7 @@ class PokemonEditor
 		int size = 0;
 		
 		// returns the number of bytes that egg moves occupies
-		for (Pokemon mon : mons)
+		for (PokemonGame mon : mons)
 		{
 			byte[] bArray = mon.getEggMoves();
 			size += bArray.length;
@@ -162,12 +162,12 @@ class PokemonEditor
 		return size;
 	}
 	
-	static Pokemon getPokemonFromByte(byte x, Pokemon[] mons)
+	static PokemonGame getPokemonFromByte(byte x, PokemonGame[] mons)
 	{
 		return mons[byteToValue(x)-1];
 	}
 	
-	Pokemon[] getAllPokemon()
+	PokemonGame[] getAllPokemon()
 	{
 		return mons;
 	}

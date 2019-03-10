@@ -171,6 +171,14 @@ public class Constants
 		
 		return res;
 	}
+
+	public static int[] byteToValue(byte[] x)
+	{
+		int[] res = new int[x.length];
+		for (int i = 0; i < x.length; i++)
+			res[i] = byteToValue(x[i]);
+		return res;
+	}
 	
 	public static byte valueToByte(int x)
 	{
@@ -181,6 +189,14 @@ public class Constants
 		else
 			res = (byte) (x - 0xFF - 1);
 		
+		return res;
+	}
+
+	public static byte[] valueToByte(int[] x)
+	{
+		byte[] res = new byte[x.length];
+		for (int i = 0; i < x.length; i++)
+			res[i] = valueToByte(x[i]);
 		return res;
 	}
 	
