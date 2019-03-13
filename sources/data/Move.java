@@ -98,12 +98,6 @@ public class Move
 		return this.name;
 	}
 	
-	public boolean isFixed()
-	{
-		// return true if it is a fixed power move
-		return (effect[0] == (byte) 0x29 || effect[0] == (byte) 0x94);
-	}
-	
 	/////////////////////////////////////////////
 	// Set value methods
 	/////////////////////////////////////////////	

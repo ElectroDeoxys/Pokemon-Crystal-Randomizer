@@ -12,6 +12,167 @@ class MoveSorter
 	private Move[] moves;
 	private Move[] movesTM;
 	private byte[] critAnims; // moves with animations linked to higher crit rates
+
+	public enum MoveEffect 
+	{
+	    NO_EFFECT 	 ((byte) 0x00),
+	    CAUSE_SLEEP	 ((byte) 0x01),
+	    DREAM_EATER  ((byte) 0x08),
+	    ATKUP1       ((byte) 0x0A),
+	    DEFUP1       ((byte) 0x0B),
+	    SATKUP1      ((byte) 0x0C),
+	    EVAUP1       ((byte) 0x10),
+	    NEVER_MISS   ((byte) 0x11),
+	    ATKDOWN1     ((byte) 0x12),
+	    DEFDOWN1     ((byte) 0x13),
+	    SPDDOWN1     ((byte) 0x14),
+	    SATKDOWN1    ((byte) 0x15),
+	    SDEFDOWN1    ((byte) 0x16),
+	    ACCDOWN1     ((byte) 0x17),
+	    EVADOWN1     ((byte) 0x18),
+	    BIDE         ((byte) 0x1A),
+	    MULTI_HIT    ((byte) 0x1D),
+	    RECOVER_REST ((byte) 0x20),
+	    CAUSE_TOXIC  ((byte) 0x21),
+	    LIGHT_SCREEN ((byte) 0x23),
+	    OHKO         ((byte) 0x26),
+	    RAZOR_WIND   ((byte) 0x27),
+	    HALVE_HP     ((byte) 0x28),
+	    FIXED_DAMAGE ((byte) 0x29),
+	    TWO_HITS     ((byte) 0x2C),
+	    CAUSE_CNF    ((byte) 0x31),
+	    ATKUP2       ((byte) 0x32),
+	    DEFUP2       ((byte) 0x33),
+	    SPDUP2       ((byte) 0x34),
+	    SATKUP2      ((byte) 0x35),
+	    SDEFUP2      ((byte) 0x36),
+	    REFLECT      ((byte) 0x41),
+	    CAUSE_PSN    ((byte) 0x42),
+	    CAUSE_PRZ    ((byte) 0x43),
+	    SKY_ATTACK   ((byte) 0x4B),
+	    TWO_HITS_PSN ((byte) 0x4D),
+	    RECHARGE     ((byte) 0x50),
+	    MIMIC        ((byte) 0x52),
+	    LVL_DAMAGE   ((byte) 0x57),
+	    RND_DAMAGE   ((byte) 0x58),
+	    COUNTER      ((byte) 0x59),
+	    LOCK_ON      ((byte) 0x5E),
+	    SLEEP_TALK   ((byte) 0x61),
+	    REVERSAL     ((byte) 0x63),
+	    DISABLE      ((byte) 0x64),
+	    PRIORITY     ((byte) 0x67),
+	    TRIPLE_HIT   ((byte) 0x68),
+	    THIEF        ((byte) 0x69),
+	    NIGHTMARE    ((byte) 0x6B),
+	    CURSE        ((byte) 0x6D),
+	    PROTECT      ((byte) 0x6F),
+	    PERISH_SONG  ((byte) 0x72),
+	    SANDSTORM    ((byte) 0x73),
+	    ENDURE       ((byte) 0x74),
+	    RETURN       ((byte) 0x79),
+	    PRESENT      ((byte) 0x7A),
+	    FRUSTRATION  ((byte) 0x7B),
+	    MAGNITUDE    ((byte) 0x7E),
+	    MORNING_SUN  ((byte) 0x84),
+	    SYNTHESIS    ((byte) 0x85),
+	    MOONLIGHT    ((byte) 0x86),
+	    HIDDEN_PWR   ((byte) 0x87),
+	    RAIN_DANCE   ((byte) 0x88),
+	    SUNNY_DAY    ((byte) 0x89),
+	    PSYCH_UP     ((byte) 0x8F),
+	    MIRROR_COAT  ((byte) 0x90),
+	    FUTURE_SIGHT ((byte) 0x94),
+		SOLARBEAM    ((byte) 0x97),
+        TELEPORT     ((byte) 0x99);
+
+	    private final byte index;
+
+	    MoveEffect(byte index) 
+	    {
+	        this.index = index;
+	    }
+
+	    public byte index() 
+	    { 
+	    	return index; 
+	    }
+	}
+
+	MoveEffect getEffect(byte effByte)
+	{
+		switch (effByte)
+		{
+			case (byte) 0x01: return MoveEffect.CAUSE_SLEEP; 
+			case (byte) 0x08: return MoveEffect.DREAM_EATER; 
+			case (byte) 0x0A: return MoveEffect.ATKUP1; 
+			case (byte) 0x0B: return MoveEffect.DEFUP1; 
+			case (byte) 0x0C: return MoveEffect.SATKUP1; 
+			case (byte) 0x10: return MoveEffect.EVAUP1; 
+			case (byte) 0x11: return MoveEffect.NEVER_MISS; 
+			case (byte) 0x12: return MoveEffect.ATKDOWN1; 
+			case (byte) 0x13: return MoveEffect.DEFDOWN1; 
+			case (byte) 0x14: return MoveEffect.SPDDOWN1; 
+			case (byte) 0x15: return MoveEffect.SATKDOWN1; 
+			case (byte) 0x16: return MoveEffect.SDEFDOWN1; 
+			case (byte) 0x17: return MoveEffect.ACCDOWN1; 
+			case (byte) 0x18: return MoveEffect.EVADOWN1; 
+			case (byte) 0x1A: return MoveEffect.BIDE; 
+			case (byte) 0x1D: return MoveEffect.MULTI_HIT; 
+			case (byte) 0x20: return MoveEffect.RECOVER_REST; 
+			case (byte) 0x21: return MoveEffect.CAUSE_TOXIC; 
+			case (byte) 0x23: return MoveEffect.LIGHT_SCREEN; 
+			case (byte) 0x26: return MoveEffect.OHKO; 
+			case (byte) 0x27: return MoveEffect.RAZOR_WIND; 
+			case (byte) 0x28: return MoveEffect.HALVE_HP; 
+			case (byte) 0x29: return MoveEffect.FIXED_DAMAGE; 
+			case (byte) 0x2C: return MoveEffect.TWO_HITS; 
+			case (byte) 0x31: return MoveEffect.CAUSE_CNF; 
+			case (byte) 0x32: return MoveEffect.ATKUP2; 
+			case (byte) 0x33: return MoveEffect.DEFUP2; 
+			case (byte) 0x34: return MoveEffect.SPDUP2; 
+			case (byte) 0x35: return MoveEffect.SATKUP2; 
+			case (byte) 0x36: return MoveEffect.SDEFUP2; 
+			case (byte) 0x41: return MoveEffect.REFLECT; 
+			case (byte) 0x42: return MoveEffect.CAUSE_PSN; 
+			case (byte) 0x43: return MoveEffect.CAUSE_PRZ; 
+			case (byte) 0x4B: return MoveEffect.SKY_ATTACK; 
+			case (byte) 0x4D: return MoveEffect.TWO_HITS_PSN; 
+			case (byte) 0x50: return MoveEffect.RECHARGE; 
+			case (byte) 0x52: return MoveEffect.MIMIC; 
+			case (byte) 0x57: return MoveEffect.LVL_DAMAGE; 
+			case (byte) 0x58: return MoveEffect.RND_DAMAGE; 
+			case (byte) 0x59: return MoveEffect.COUNTER; 
+			case (byte) 0x5E: return MoveEffect.LOCK_ON; 
+			case (byte) 0x61: return MoveEffect.SLEEP_TALK; 
+			case (byte) 0x63: return MoveEffect.REVERSAL; 
+			case (byte) 0x64: return MoveEffect.DISABLE; 
+			case (byte) 0x67: return MoveEffect.PRIORITY; 
+			case (byte) 0x68: return MoveEffect.TRIPLE_HIT; 
+			case (byte) 0x69: return MoveEffect.THIEF; 
+			case (byte) 0x6B: return MoveEffect.NIGHTMARE; 
+			case (byte) 0x6D: return MoveEffect.CURSE; 
+			case (byte) 0x6F: return MoveEffect.PROTECT; 
+			case (byte) 0x72: return MoveEffect.PERISH_SONG; 
+			case (byte) 0x73: return MoveEffect.SANDSTORM; 
+			case (byte) 0x74: return MoveEffect.ENDURE; 
+			case (byte) 0x79: return MoveEffect.RETURN; 
+			case (byte) 0x7A: return MoveEffect.PRESENT; 
+			case (byte) 0x7B: return MoveEffect.FRUSTRATION; 
+			case (byte) 0x7E: return MoveEffect.MAGNITUDE; 
+			case (byte) 0x84: return MoveEffect.MORNING_SUN; 
+			case (byte) 0x85: return MoveEffect.SYNTHESIS; 
+			case (byte) 0x86: return MoveEffect.MOONLIGHT; 
+			case (byte) 0x87: return MoveEffect.HIDDEN_PWR; 
+			case (byte) 0x88: return MoveEffect.RAIN_DANCE; 
+			case (byte) 0x89: return MoveEffect.SUNNY_DAY; 
+			case (byte) 0x8F: return MoveEffect.PSYCH_UP; 
+			case (byte) 0x90: return MoveEffect.MIRROR_COAT; 
+			case (byte) 0x94: return MoveEffect.FUTURE_SIGHT; 
+			case (byte) 0x97: return MoveEffect.SOLARBEAM; 
+			case (byte) 0x99: return MoveEffect.TELEPORT; 
+			default: 		  return MoveEffect.NO_EFFECT;
+		}
+	}
 	
 	MoveSorter(Move[] moves, Move[] movesTM, byte[] critAnims) 
 	{
@@ -41,7 +202,9 @@ class MoveSorter
 		
 		for (int i = 0; i < moves.length; i++)
 		{
-			byte[] eff = moves[i].getEffect();
+			byte[] effByte = moves[i].getEffect();
+			MoveEffect eff = getEffect(effByte[0]);
+
 			int basePower = byteToValue(moves[i].getBasePower());
 			int indexTier = 0;
 			float accFloat = byteToValue(moves[i].getAcc());
@@ -51,49 +214,49 @@ class MoveSorter
 			{
 				int calcPower = basePower;
 
-				if (eff[0] != (byte) 0x11) // taking accuracy into account
+				if (eff != MoveEffect.NEVER_MISS) // taking accuracy into account
 					calcPower = (int) round((float) (calcPower * acc));
 					
 				if (hasCritAnim(moves[i])) // taking into account crit
 					calcPower = (int) round((1 + 2 * (1/4)) * calcPower);
-				else if (eff[0] != (byte) 0x29 && eff[0] != (byte) 0x94) // other moves that can crit
+				else if (!isFixed(moves[i])) // other moves that can crit
 					calcPower = (int) round((1 + 2 * (1/16)) * calcPower);
 				
-				if (eff[0] == (byte) 0x1D) // 2-5 multiple hits hits on average 3 times
+				if (eff == MoveEffect.MULTI_HIT) // 2-5 multiple hits hits on average 3 times
 					calcPower = 3 * calcPower;
-				else if (eff[0] == (byte) 0x2C || eff[0] == (byte) 0x4D) // always hits twice
+				else if (eff == MoveEffect.TWO_HITS || eff == MoveEffect.TWO_HITS_PSN) // always hits twice
 					calcPower = 2 * calcPower;
-				else if (eff[0] == (byte) 0x68) // hits three times with higher BP
+				else if (eff == MoveEffect.TRIPLE_HIT) // hits three times with higher BP
 					calcPower = 6 * calcPower;
-				else if (eff[0] == (byte) 0x27 || eff[0] == (byte) 0x4B || eff[0] == (byte) 0x50 || eff[0] == (byte) 0x97) // two-turn attacks
+				else if (eff == MoveEffect.RAZOR_WIND || eff == MoveEffect.SKY_ATTACK || eff == MoveEffect.RECHARGE || eff == MoveEffect.SOLARBEAM) // two-turn attacks
 					calcPower = calcPower/2;
-				else if (eff[0] == (byte) 0x08) // dream eater
+				else if (eff == MoveEffect.DREAM_EATER) // dream eater
 					calcPower = 1;
 				
 				indexTier = (int) min(floor(max(calcPower, 0) / span), N_MOVE_TIERS - 1);
 				
-				if (eff[0] == (byte) 0x67) // increased priority moves get bumped up a tier
+				if (eff == MoveEffect.PRIORITY) // increased priority moves get bumped up a tier
 					indexTier = (int) min(indexTier + 1, N_MOVE_TIERS - 1);
 				
 				moves[i].setCalcPower(calcPower);
 			}
 			else if (basePower == 1) // counter damage & other attacks
 			{
-				if (eff[0] == (byte) 0x79 // return
-				 || eff[0] == (byte) 0x7A // present
-				 || eff[0] == (byte) 0x7B)// frustration 
+				if (eff == MoveEffect.RETURN
+				 || eff == MoveEffect.PRESENT
+				 || eff == MoveEffect.FRUSTRATION)
 					indexTier = MOVE_BOT_TIER;
-				else if (eff[0] == (byte) 0x59 || eff[0] == (byte) 0x57 || eff[0] == (byte) 0x58 || eff[0] == (byte) 0x90) // countering/level-based
+				else if (eff == MoveEffect.COUNTER || eff == MoveEffect.LVL_DAMAGE || eff == MoveEffect.RND_DAMAGE || eff == MoveEffect.MIRROR_COAT) // countering/level-based
 					indexTier = MOVE_MID_TIER;
-				else if (eff[0] == (byte) 0x28 || eff[0] == (byte) 0x68) // halving/reversal
+				else if (eff == MoveEffect.HALVE_HP || eff == MoveEffect.REVERSAL) // halving/reversal
 					indexTier = MOVE_2ND_TIER;
-				else if (eff[0] == (byte) 0x7E) // magnitude has average power of 71
+				else if (eff == MoveEffect.MAGNITUDE) // magnitude has average power of 71
 				{
 					int calcPower = (int) round(71 * acc);
 					indexTier = (int) min(floor(max(calcPower, 0) / span), N_MOVE_TIERS - 1);
 					moves[i].setCalcPower(calcPower);
 				}
-				else if (eff[0] == (byte) 0x87) // hidden power has average power of 40
+				else if (eff == MoveEffect.HIDDEN_PWR) // hidden power has average power of 40
 				{
 					int calcPower = (int) round(40 * acc);
 					indexTier = (int) min(floor(max(calcPower, 0) / span), N_MOVE_TIERS - 1);
@@ -106,54 +269,57 @@ class MoveSorter
 				indexTier = (N_MOVE_TIERS - 1) - (int) min(floor(max(pP - botPP, 0) / spanPP), N_MOVE_TIERS - 1);
 				
 				// list some exceptions
-				if (eff[0] == (byte) 0x32 // sharply raise ATK
-				 || eff[0] == (byte) 0x34 // sharply raise SATK
-				 || eff[0] == (byte) 0x35 // sharply raise SPD
-				 || eff[0] == (byte) 0x84 //
-				 || eff[0] == (byte) 0x85 //
-				 || eff[0] == (byte) 0x86 //
-				 || (eff[0] == (byte) 0x20 && moves[i].getIndex() != (byte) 0x9C)) // recovery (not rest)
+				if (eff == MoveEffect.ATKUP2
+				 || eff == MoveEffect.SPDUP2
+				 || eff == MoveEffect.SATKUP2
+				 || eff == MoveEffect.MORNING_SUN
+				 || eff == MoveEffect.SYNTHESIS
+				 || eff == MoveEffect.MOONLIGHT
+				 || (eff == MoveEffect.RECOVER_REST && moves[i].getIndex() != (byte) 0x9C)) // recovery (not rest)
 					indexTier = MOVE_TOP_TIER;
-				else if (eff[0] == (byte) 0x23 
-					  || eff[0] == (byte) 0x41)
+				else if (eff == MoveEffect.LIGHT_SCREEN 
+					  || eff == MoveEffect.REFLECT)
 					indexTier = MOVE_2ND_TIER;
-				else if (eff[0] == (byte) 0x01 // cause sleep
-					  || eff[0] == (byte) 0x21 
-					  || eff[0] == (byte) 0x31 
-					  || eff[0] == (byte) 0x42 
-					  || eff[0] == (byte) 0x43)
+				else if (eff == MoveEffect.CAUSE_SLEEP
+					  || eff == MoveEffect.CAUSE_TOXIC 
+					  || eff == MoveEffect.CAUSE_CNF 
+					  || eff == MoveEffect.CAUSE_PSN 
+					  || eff == MoveEffect.CAUSE_PRZ)
 				{
 					if (acc >= 0.75 ) // accurate status inducing moves
 						indexTier = MOVE_TOP_TIER;
 					else // inaccurate
 						indexTier = MOVE_MID_TIER;
 				}
-				else if (eff[0] == (byte) 0x52 // mimic
-					  || eff[0] == (byte) 0x1A // bide
-					  || eff[0] == (byte) 0x72 // perish song
-					  || eff[0] == (byte) 0x5E // lock-on
-					  || eff[0] == (byte) 0x8F // psych up
-					  || eff[0] == (byte) 0x26 // OHKO
-					  || eff[0] == (byte) 0x6B // nightmare
-					  || eff[0] == (byte) 0x64 // teleport
-					  || eff[0] == (byte) 0x12 // 1 stage lowering 
-					  || eff[0] == (byte) 0x13 
-					  || eff[0] == (byte) 0x14 
-					  || eff[0] == (byte) 0x17 
-					  || eff[0] == (byte) 0x18
-					  || eff[0] == (byte) 0x73 // treat weather effects separately 
-					  || eff[0] == (byte) 0x88 
-					  || eff[0] == (byte) 0x89 
-					  || eff[0] == (byte) 0x61)
+				else if (eff == MoveEffect.MIMIC
+					  || eff == MoveEffect.BIDE
+					  || eff == MoveEffect.PERISH_SONG
+					  || eff == MoveEffect.LOCK_ON
+					  || eff == MoveEffect.PSYCH_UP
+					  || eff == MoveEffect.OHKO
+					  || eff == MoveEffect.NIGHTMARE
+					  || eff == MoveEffect.DISABLE
+					  || eff == MoveEffect.TELEPORT
+					  || eff == MoveEffect.ATKDOWN1
+					  || eff == MoveEffect.DEFDOWN1 
+					  || eff == MoveEffect.SPDDOWN1 
+					  || eff == MoveEffect.SATKDOWN1 
+					  || eff == MoveEffect.SDEFDOWN1
+					  || eff == MoveEffect.ACCDOWN1
+					  || eff == MoveEffect.EVADOWN1
+					  || eff == MoveEffect.SANDSTORM // treat weather effects separately 
+					  || eff == MoveEffect.RAIN_DANCE 
+					  || eff == MoveEffect.SUNNY_DAY 
+					  || eff == MoveEffect.SLEEP_TALK)
 					indexTier = MOVE_BOT_TIER;
-				else if (eff[0] == (byte) 0x0A // 1 stage raising
-					  || eff[0] == (byte) 0x0B 
-					  || eff[0] == (byte) 0x0D
-					  || (eff[0] == (byte) 0x20 && moves[i].getIndex() == (byte) 0x9C) // rest
-					  || eff[0] == (byte) 0x10 // protect
-					  || eff[0] == (byte) 0x6D // curse
-					  || eff[0] == (byte) 0x6F 
-					  || eff[0] == (byte) 0x74) // endure
+				else if (eff == MoveEffect.ATKUP1 // 1 stage raising
+					  || eff == MoveEffect.DEFUP1 
+					  || eff == MoveEffect.SATKUP1
+					  || eff == MoveEffect.EVAUP1
+					  || (eff == MoveEffect.RECOVER_REST && moves[i].getIndex() == (byte) 0x9C) // rest
+					  || eff == MoveEffect.CURSE
+					  || eff == MoveEffect.PROTECT 
+					  || eff == MoveEffect.ENDURE)
 					indexTier = MOVE_MID_TIER;
 			}
 			
@@ -214,19 +380,20 @@ class MoveSorter
 			if (listMoves.contains(movesTM[i])) // avoid repeats
 				continue;
 				
-			byte[] eff = movesTM[i].getEffect();
+			byte[] effByte = movesTM[i].getEffect();
+			MoveEffect eff = getEffect(effByte[0]);
 			
 			/*
-			if (eff[0] == (byte) 0x21)
+			if (eff == (byte) 0x21)
 				if ((byteToValue(baseStats[1]) >= 70 || byteToValue(baseStats[4]) >= 70) // it has good attacking stats
 					 || (byteToValue(baseStats[1]) + byteToValue(baseStats[4]) > byteToValue(baseStats[2]) + byteToValue(baseStats[5]))) // or is more offensive
 					continue; // skip Toxic
 			*/
 					
-			if (eff[0] == (byte) 0x69)
+			if (eff == MoveEffect.THIEF)
 				continue; // skip Thief
 			
-			if (eff[0] == (byte) 0x87)
+			if (eff == MoveEffect.HIDDEN_PWR)
 				continue; // skip Hidden Power
 			
 			
@@ -277,13 +444,12 @@ class MoveSorter
 		int out;
 		byte moveType = move.getType();
 		byte moveCat = move.getCat();
-		byte[] eff = move.getEffect();
 		
 		if (move.getCalcPower() <= 1) 
 			out = move.getCalcPower(); // do nothing with non-damaging moves
 		else
 		{
-			out = (moveType == types[0] || moveType == types[1] && (!move.isFixed())) ? (int) (move.getCalcPower() * 1.5) : move.getCalcPower(); // apply STAB except to Future Sight
+			out = (moveType == types[0] || moveType == types[1] && (!isFixed(move))) ? (int) (move.getCalcPower() * 1.5) : move.getCalcPower(); // apply STAB except to Future Sight
 			
 			if (moveCat == 0b01000000) // physical/special move takes into account atk/satk
 				out = out * byteToValue(atk);
@@ -300,13 +466,12 @@ class MoveSorter
 		int out;
 		byte moveType = move.getType();
 		byte moveCat = move.getCat();
-		byte[] eff = move.getEffect();
 		
 		if (dam <= 1) 
 			out = dam; // do nothing with non-damaging moves
 		else
 		{
-			out = (moveType == types[0] || moveType == types[1] && (!move.isFixed())) ? (int) (dam * 1.5) : dam; // apply STAB except to fixed power
+			out = (moveType == types[0] || moveType == types[1] && (!isFixed(move))) ? (int) (dam * 1.5) : dam; // apply STAB except to fixed power
 			
 			if (moveCat == 0b01000000) // physical/special move takes into account atk/satk
 				out = out * byteToValue(atk);
@@ -363,10 +528,10 @@ class MoveSorter
 					slotMovePower = getPower(thisSlotMove, monTypes, baseStats[1], baseStats[4]);
 					
 					if (movePower > slotMovePower // if stack is stronger
-						|| ((thisSlotMove.isFixed()) && movePower * 2 > slotMovePower && move.getType() != (byte) 0x00)) // or if compared to Future Sight it can hit super-effective
+						|| ((isFixed(thisSlotMove)) && movePower * 2 > slotMovePower && move.getType() != (byte) 0x00)) // or if compared to Future Sight it can hit super-effective
 					{
 						if (!(repeatedType(move, moveSet, i)) // if there isn't another move of this type
-							&& !(move.getType() == (byte) 0x00 && movePower < 2 * slotMovePower && (!thisSlotMove.isFixed()))) // if move isn't normal-type replacing coverage moves
+							&& !(move.getType() == (byte) 0x00 && movePower < 2 * slotMovePower && (!isFixed(thisSlotMove)))) // if move isn't normal-type replacing coverage moves
 						{
 							moveSet.set(i, move);
 							break; // no need looking more
@@ -395,7 +560,7 @@ class MoveSorter
 					}
 					else if ((movePower >= slotMovePower - getPower(move, MOVE_DAM_MARGIN, monTypes, baseStats[1], baseStats[4]))  // check if it's a similar move in power
 						&& (nDam > 1 && move.getType() == thisSlotMove.getType()) // if it's of the same type
-						&& (!move.isFixed()) // not future sight
+						&& (!isFixed(move)) // not future sight
 						&& (!(repeatedType(move, moveSet, i))) // if there isn't another move of this type
 						&& (movePower > 1)) // and is damaging
 					{
@@ -448,5 +613,14 @@ class MoveSorter
 		}
 		
 		return repType;
+	}
+
+	private boolean isFixed(Move move)
+	{
+		byte[] effByte = move.getEffect();
+		MoveEffect eff = getEffect(effByte[0]);
+
+		// return true if it is a fixed power move
+		return (eff == MoveEffect.FIXED_DAMAGE || eff == MoveEffect.FUTURE_SIGHT);
 	}
 }
