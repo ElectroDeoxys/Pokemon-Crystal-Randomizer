@@ -5,6 +5,7 @@ import java.io.IOException;
 import static java.lang.Math.*;
 
 import static data.Constants.*;
+import data.Move;
 import data.Trainer;
 import data.PokemonGame;
 
@@ -334,7 +335,8 @@ class TrainerEditor
 	byte[] getMoveset(MoveSorter moveSorter, int monInt, byte lvl, boolean extraCust)
 	{
 		int thisMon = monInt - 1;
-		byte[] lvlMoves = mons[thisMon].getMovesUpToLevel(lvl);
+		byte[][] lvlMoves = mons[thisMon].getMovesUpToLevel(mons, lvl);
+
 		byte[] newMoves = new byte[4];
 
 		if (extraCust) // get customized moveset
@@ -347,13 +349,38 @@ class TrainerEditor
 		else // apply only level-up moves in reverse order
 			for (int k = 0; k < 4; k++)
 			{
-				if (k < lvlMoves.length)
-					newMoves[k] = lvlMoves[k];
+				if (k < lvlMoves[0].length)
+					newMoves[k] = lvlMoves[0][k];
 				else
 					newMoves[k] = (byte) 0x00;
 			}
 			
 		return newMoves;
+	}
+
+	void applyMovesets(PokemonGame[] mons, TeamCustomizer teamCust, Names names)
+	{	
+		for (Trainer t : trainers)
+		{
+			byte kind = t.getKind();
+			
+			if (kind != 1 && kind != 3)
+				continue; // no custom moves
+			
+			PokemonGame[] team = new PokemonGame[t.getPartySize()];
+			int[] lvls = new int[team.length];
+
+			for (int i = 0; i < team.length; i++)
+			{
+				int pokeIndex = byteToValue(t.getPokeByte(i));
+				team[i] = mons[pokeIndex - 1];
+
+				int lvl = byteToValue(t.getLvl(i));
+				lvls[i] = lvl;
+			}
+
+			teamCust.customize(team, lvls, mons, names);
+		}
 	}
 	
 	private Type[] randomizeTypeList(Type[] typeList)

@@ -9,6 +9,7 @@ public class Move
 	private byte[] effect; // [effect index, chance]
 	private byte basePower;
 	private byte typeCat;
+	private Type type;
 	private byte acc;
 	private byte pP;
 	private int tier = 0;
@@ -26,6 +27,8 @@ public class Move
 		this.typeCat = typeCat;
 		this.acc = acc;
 		this.pP = pP;
+
+		resolveType();
 	}
 	
 	/////////////////////////////////////////////
@@ -53,7 +56,7 @@ public class Move
 		return basePower;
 	}
 	
-	public byte getType()
+	public byte getTypeByte()
 	{
 		return (byte) (typeCat & 0b00111111);
 	}
@@ -61,6 +64,21 @@ public class Move
 	public byte getCat()
 	{
 		return (byte) (typeCat & 0b11000000);
+	}
+
+	private void resolveType()
+	{
+		for (Type t : Type.values())
+        	if (t.byteIndex() == getTypeByte())
+        	{
+        		type = t;
+        		break;
+        	}
+	}
+
+	public Type getType()
+	{
+		return type;
 	}
 	
 	public byte getTypeCat()

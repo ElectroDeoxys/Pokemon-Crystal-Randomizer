@@ -49,19 +49,24 @@ public abstract class Pokemon
 		return this.trueIndex;
 	}
 	
-	public byte[] getBase()
+	public byte[] getBaseBytes()
 	{
 		return this.base;
 	}
-	
-	public byte[] getTypes()
+
+	public int[] getBase()
 	{
-		return this.typeByte;
+		return byteToValue(this.base);
+	}
+	
+	public Type[] getTypes()
+	{
+		return this.types;
 	}
 
-	public Type[] getIndexTypes()
+	public byte[] getTypesByte()
 	{
-		return types;
+		return typeByte;
 	}
 	
 	public byte[] getMisc()
@@ -206,7 +211,7 @@ public abstract class Pokemon
 		return out;
 	}
 
-	public byte[] getMovesUpToLevel(byte lvl) // gets all moves learned at and before lvl
+	public byte[] getMovesUpToLevel(byte lvl) // gets moves learned at and before lvl only for this stage
 	{
 		ArrayList<Byte> movesOut = new ArrayList<Byte>();
 		int n = this.move.length - 1; // index to start decreasing moveset
@@ -224,7 +229,37 @@ public abstract class Pokemon
 		
 		return convertByteArray(movesOut.toArray(new Byte[0]));
 	}
-	
+
+	public byte[][] getMovesUpToLevel(Pokemon[] mons, byte lvl) // gets all moves learned at and before lvl including pre-evolutions
+	{
+		int[] preEvoIndex = {-1, -1};
+
+		int nPre = 0;
+
+		if (hasPre())
+		{
+			nPre++;
+
+			byte[] preEvoByte = getPreEvo();
+			preEvoIndex[0] = byteToValue(preEvoByte[0]) - 1;
+
+			if (mons[preEvoIndex[0]].hasPre())
+			{
+				nPre++;
+				preEvoByte = mons[preEvoIndex[0]].getPreEvo();
+				preEvoIndex[1] = byteToValue(preEvoByte[0]) - 1;
+			}
+		}
+
+		byte[][] lvlMoves = new byte[nPre + 1][];
+		lvlMoves[0] = getMovesUpToLevel(lvl);
+
+		for (int i = 0; i < nPre; i++)// cycle pre-evolutions
+			lvlMoves[i+1] = mons[preEvoIndex[i]].getMovesUpToLevel(lvl);
+
+		return lvlMoves;
+	}
+
 	public int getOldTier()
 	{
 		return this.oldTier;
@@ -259,6 +294,42 @@ public abstract class Pokemon
 		}
 	
 		return exp;
+	}
+
+	public int getHP()
+	{
+		int[] baseStats = byteToValue(base);
+		return baseStats[0];
+	}
+
+	public int getAtk()
+	{
+		int[] baseStats = byteToValue(base);
+		return baseStats[1];
+	}
+	
+	public int getDef()
+	{
+		int[] baseStats = byteToValue(base);
+		return baseStats[2];
+	}
+	
+	public int getSpd()
+	{
+		int[] baseStats = byteToValue(base);
+		return baseStats[3];
+	}
+	
+	public int getSAtk()
+	{
+		int[] baseStats = byteToValue(base);
+		return baseStats[4];
+	}
+	
+	public int getSDef()
+	{
+		int[] baseStats = byteToValue(base);
+		return baseStats[5];
 	}
 	
 	/////////////////////////////////////////////

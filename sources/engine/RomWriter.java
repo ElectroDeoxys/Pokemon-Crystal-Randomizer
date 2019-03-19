@@ -137,8 +137,8 @@ class RomWriter
 			byte[] padding = {(byte) 0x0, (byte) 0x0, (byte) 0x0, (byte) 0x0};
 			
 			buffer1.put(mons[i].getIndex());
-			buffer1.put(mons[i].getBase());
-			buffer1.put(mons[i].getTypes());
+			buffer1.put(mons[i].getBaseBytes());
+			buffer1.put(mons[i].getTypesByte());
 			buffer1.put(misc[0]);
 			buffer1.put(misc[1]);
 			buffer1.put(misc[2]);

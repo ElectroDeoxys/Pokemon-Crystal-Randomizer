@@ -95,7 +95,7 @@ class PokemonSorter
 			
 			// concerning type sorting
 			
-			Type[] typeOfMon = mons[i].getIndexTypes();
+			Type[] typeOfMon = mons[i].getTypes();
 			
 			typeHolder.get(typeOfMon[0].intIndex()).add(mons[i].getIntIndex());
 			
@@ -468,8 +468,8 @@ class PokemonSorter
 	private boolean areSameType(Pokemon mon1, Pokemon mon2)
 	{
 		// gets two Pokemon and decides if they share a type
-		Type[] types1 = mon1.getIndexTypes();
-		Type[] types2 = mon2.getIndexTypes();
+		Type[] types1 = mon1.getTypes();
+		Type[] types2 = mon2.getTypes();
 		boolean out = (types1[0] == types2[0] || types1[0] == types2[1] || types1[1] == types2[0] || types1[1] == types2[1]);
 		return out;
 	}
@@ -489,7 +489,7 @@ class PokemonSorter
 		Type[][] types = new Type[monList.length][2]; // two types per Pokemon
 		
 		for (int i = 0; i < monList.length; i++) // cycle Pokemon list
-			types[i] = monList[i].getIndexTypes();
+			types[i] = monList[i].getTypes();
 		
 		if (total) // all it takes is one repeated type
 		{
@@ -745,7 +745,7 @@ class PokemonSorter
 	byte[] getMoveset(MoveSorter moveSorter, int monInt, byte lvl, boolean extraCust)
 	{
 		int thisMon = monInt - 1;
-		byte[] lvlMoves = mons[thisMon].getMovesUpToLevel(lvl);
+		byte[][] lvlMoves = mons[thisMon].getMovesUpToLevel(mons, lvl);
 		byte[] newMoves = new byte[4];
 
 		if (extraCust) // get customized moveset
@@ -759,7 +759,7 @@ class PokemonSorter
 			for (int k = 0; k < 4; k++)
 			{
 				if (k < lvlMoves.length)
-					newMoves[k] = lvlMoves[k];
+					newMoves[k] = lvlMoves[0][k];
 				else
 					newMoves[k] = (byte) 0x00;
 			}

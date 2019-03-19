@@ -94,7 +94,7 @@ class Main
 			romWriter.replaceAllSprites(spriteEditor.getAllSprites(), spriteEditor.getAllTrainerSprites(), spriteEditor.getEggSprite(), spriteEditor.getAllPalettes());
 			
 			Names names = new Names(monEditor.getAllPokemon(), trainerEditor.getTrainers(), moveEditor.getMoves());
-			PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), romReader.readRomStarters(), names);
+			PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), romReader.readRomStarters());
 			
 			romWriter.randomizeStarters(monSorter, starterKind);
 			
@@ -115,6 +115,9 @@ class Main
 			/////////////////////////////////////
 
 			trainerEditor.printCustTeams(names);
+			
+			TeamCustomizer teamCust = new TeamCustomizer(moveEditor.getMoves(), moveSorter);
+			trainerEditor.applyMovesets(monEditor.getAllPokemon(), teamCust, names);
 			
 			/////////////////////////////////////
 			// manipulate save data

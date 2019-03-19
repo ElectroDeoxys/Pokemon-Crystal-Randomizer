@@ -46,7 +46,6 @@ public class Constants
 	    }
 	}
 
-
 	public static final int N_POKEMON_DATA = 493; // number of Pokemon in data
 	public static final int N_TRAINERS = 541;
 	public static final int N_POKEMON = byteToValue((byte) 0xFB);
@@ -100,6 +99,10 @@ public class Constants
 	public static final int[] OFFSET_WILD_ITEM_RATE = {0x3E921, 0x3E92A};
 	
 	public static final int SIZE_EGG_MOVES_MEM = 0x2F9; // size of memory capable of holding egg moves
+
+	public static final byte MOVE_PHYSICAL_CATEGORY = (byte) 0b01000000;
+	public static final byte MOVE_SPECIAL_CATEGORY  = (byte) 0b10000000;
+	public static final byte MOVE_OTHER_CATEGORY    = (byte) 0b11000000;
 	
 	public static final int[] N_WILD_SLOTS = {21, 3}; // number of Pokemon slots in a land/water route
 	public static final int[] N_BYTES_WILD = {((N_WILD_SLOTS[0] * 2) + 5), ((N_WILD_SLOTS[1] * 2) + 3)}; // number of bytes per land/water route
