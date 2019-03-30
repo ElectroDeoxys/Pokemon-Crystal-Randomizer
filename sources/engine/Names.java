@@ -117,8 +117,8 @@ public class Names
 			int byteGet = byteToValue(byteStr[i]);
 			
 			int[] indexChar = new int[2];
-			indexChar[0] = (int) (byteGet - 0x80);
-			indexChar[1] = (int) (byteGet - 0xF6);
+			indexChar[0] = (byteGet - 0x80);
+			indexChar[1] = (byteGet - 0xF6);
 			
 			if ((indexChar[0] >= 0) && (indexChar[0] < lookupAlpha.length)) // is an alpha char
 				str[i] = lookupAlpha[indexChar[0]];

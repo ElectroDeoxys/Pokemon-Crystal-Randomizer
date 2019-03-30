@@ -116,8 +116,8 @@ public class Constants
 	
 	public static final int N_MOVE_TIERS = 5;
 	public static final int MOVE_BOT_TIER = 0;
-	public static final int MOVE_MID_TIER = (int) round((N_MOVE_TIERS - 1) / 2);
-	public static final int MOVE_2ND_TIER = (int) max(N_MOVE_TIERS - 2, 0);
+	public static final int MOVE_MID_TIER = round((N_MOVE_TIERS - 1) / 2);
+	public static final int MOVE_2ND_TIER = max(N_MOVE_TIERS - 2, 0);
 	public static final int MOVE_TOP_TIER = N_MOVE_TIERS - 1;
 	public static final int MOVE_DAM_MARGIN = 10; // margin of damage to replace a similar move
 	
@@ -170,7 +170,7 @@ public class Constants
 		int res = (int) x;
 		
 		if (x < 0)
-			res = (int) (x + 0xFF) + 1;
+			res = (x + 0xFF) + 1;
 		
 		return res;
 	}

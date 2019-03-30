@@ -71,12 +71,12 @@ class MoveSorter extends MoveAnalyser
 		int calcPower = basePower;
 
 		if (eff != MoveEffect.NEVER_MISS) // taking accuracy into account
-			calcPower = (int) round((float) (calcPower * acc));
+			calcPower = round(calcPower * acc);
 			
 		if (hasCritAnim(move)) // taking into account crit
-			calcPower = (int) round((1 + 2 * (1/4)) * calcPower);
+			calcPower = round((1 + 2 * (1/4)) * calcPower);
 		else if (!isFixed(move)) // other moves that can crit
-			calcPower = (int) round((1 + 2 * (1/16)) * calcPower);
+			calcPower = round((1 + 2 * (1/16)) * calcPower);
 		
 		if (eff == MoveEffect.MULTI_HIT) // 2-5 multiple hits hits on average 3 times
 			calcPower = 3 * calcPower;
@@ -92,7 +92,7 @@ class MoveSorter extends MoveAnalyser
 		indexTier = (int) min(floor(max(calcPower, 0) / span), N_MOVE_TIERS - 1);
 		
 		if (eff == MoveEffect.PRIORITY) // increased priority moves get bumped up a tier
-			indexTier = (int) min(indexTier + 1, N_MOVE_TIERS - 1);
+			indexTier = min(indexTier + 1, N_MOVE_TIERS - 1);
 		
 		move.setCalcPower(calcPower);
 
@@ -116,13 +116,13 @@ class MoveSorter extends MoveAnalyser
 			indexTier = MOVE_2ND_TIER;
 		else if (eff == MoveEffect.MAGNITUDE) // magnitude has average power of 71
 		{
-			int calcPower = (int) round(71 * acc);
+			int calcPower = round(71 * acc);
 			indexTier = (int) min(floor(max(calcPower, 0) / span), N_MOVE_TIERS - 1);
 			move.setCalcPower(calcPower);
 		}
 		else if (eff == MoveEffect.HIDDEN_PWR) // hidden power has average power of 40
 		{
-			int calcPower = (int) round(40 * acc);
+			int calcPower = round(40 * acc);
 			indexTier = (int) min(floor(max(calcPower, 0) / span), N_MOVE_TIERS - 1);
 			move.setCalcPower(calcPower);
 		}
@@ -161,7 +161,7 @@ class MoveSorter extends MoveAnalyser
 		else
 		{
 			maxPower = 0xFF; // no max power
-			maxTier = (int) N_MOVE_TIERS - 1;
+			maxTier = N_MOVE_TIERS - 1;
 		}
 		
 		// get all the level up moves first
@@ -440,11 +440,9 @@ class MoveSorter extends MoveAnalyser
 		return repType;
 	}
 
-	private boolean isFixed(Move move)
+	public void printMoveTiers(Names names)
 	{
-		MoveEffect eff = getEffect(move);
-
-		// return true if it is a fixed power move
-		return (eff == MoveEffect.FIXED_DAMAGE || eff == MoveEffect.FUTURE_SIGHT);
+		for (Move m : moves)
+			System.out.printf("%-12s: tier = %1d, calcPower = %-3d\n", names.move(m.getIndex()), m.getTier(), m.getCalcPower());
 	}
 }

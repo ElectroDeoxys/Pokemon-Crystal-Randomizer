@@ -49,7 +49,7 @@ class TrainerEditor
 			{
 				byte[] b = trainers[i].getPokeBytes(j);
 				
-				lvl[j] = (int) min((byteToValue(b[0]) + 15), 100);
+				lvl[j] = min((byteToValue(b[0]) + 15), 100);
 				party[j] = b[1];
 				partyTiers[j] = monSorter.getPokemonOldTier(byteToValue(party[j]), false);
 				
@@ -78,7 +78,7 @@ class TrainerEditor
 			for (int j = size; j < newSize; j++) // add the new Pokemon to party
 			{	
 				lastLvl += (int) floor(random() * 2); // randomly add levels
-				lastLvl = (int) min(lastLvl, 100); // constrain level
+				lastLvl = min(lastLvl, 100); // constrain level
 				newLvl[j] = lastLvl;
 				
 				int randTier = partyTiers[(int) floor(random() * size)]; // get a random tier from the original party
@@ -157,7 +157,7 @@ class TrainerEditor
 				}
 				else
 				{
-					trainers[i].setPoke(j, (byte) valueToByte((int) floor(N_POKEMON * random()) + 1));
+					trainers[i].setPoke(j, valueToByte((int) floor(N_POKEMON * random()) + 1));
 				}
 			}
 		}
@@ -331,6 +331,34 @@ class TrainerEditor
 			}
 		}
 	}
+
+	void applyMovesets(PokemonGame[] mons, TeamCustomizer teamCust)
+	{	
+		for (Trainer t : trainers)
+		{
+			byte kind = t.getKind();
+			
+			if (kind != 1 && kind != 3)
+				continue; // no custom moves
+			
+			PokemonGame[] team = new PokemonGame[t.getPartySize()];
+			int[] lvls = new int[team.length];
+
+			for (int i = 0; i < team.length; i++)
+			{
+				int pokeIndex = byteToValue(t.getPokeByte(i));
+				team[i] = mons[pokeIndex - 1];
+
+				int lvl = byteToValue(t.getLvl(i));
+				lvls[i] = lvl;
+			}
+
+			ArrayList<ArrayList<Move>> movesets = teamCust.customize(team, lvls, mons);
+
+			for (int j = 0; j < t.getPartySize(); j++)
+				t.setMoves(j, movesets.get(j));
+		}
+	}
 	
 	byte[] getMoveset(MoveSorter moveSorter, int monInt, byte lvl, boolean extraCust)
 	{
@@ -356,31 +384,6 @@ class TrainerEditor
 			}
 			
 		return newMoves;
-	}
-
-	void applyMovesets(PokemonGame[] mons, TeamCustomizer teamCust, Names names)
-	{	
-		for (Trainer t : trainers)
-		{
-			byte kind = t.getKind();
-			
-			if (kind != 1 && kind != 3)
-				continue; // no custom moves
-			
-			PokemonGame[] team = new PokemonGame[t.getPartySize()];
-			int[] lvls = new int[team.length];
-
-			for (int i = 0; i < team.length; i++)
-			{
-				int pokeIndex = byteToValue(t.getPokeByte(i));
-				team[i] = mons[pokeIndex - 1];
-
-				int lvl = byteToValue(t.getLvl(i));
-				lvls[i] = lvl;
-			}
-
-			teamCust.customize(team, lvls, mons, names);
-		}
 	}
 	
 	private Type[] randomizeTypeList(Type[] typeList)

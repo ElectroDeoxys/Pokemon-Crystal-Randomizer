@@ -102,8 +102,8 @@ class RomReader
 			
 			for(int j = 0; j < N_WILD_SLOTS[lIndex]; j++) // cycle slots to split Pokemon and Lvls
 			{
-				poke[j] = (byte) dataRead[2*j+1];
-				lvl[j] = (byte) dataRead[2*j];
+				poke[j] = dataRead[2*j+1];
+				lvl[j] = dataRead[2*j];
 			}
 		
 			routes[i] = new Route(i, poke, lvl);
@@ -616,6 +616,7 @@ class RomReader
 							break;
 						default: break;
 					}
+					break;
 				default: break;
 			}
 			

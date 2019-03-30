@@ -494,6 +494,7 @@ class DataReader
 							break;
 						default: break;
 					}
+					break;
 				default: break;
 			}
 			

@@ -85,7 +85,7 @@ class PokemonSorter
 			
 			int bst = mons[i].getBST();
 			int indexTier = (int) min(floor(max((bst - (BOT_BST + 1)), 0) / span), N_TIERS - 1);
-			int indexTypeTier = (int) floor((float) typeTierMult * indexTier);
+			int indexTypeTier = (int) floor(typeTierMult * indexTier);
 			
 			// min (max) are for BST under (above) the specified bounds
 			

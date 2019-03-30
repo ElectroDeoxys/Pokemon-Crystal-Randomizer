@@ -1,5 +1,6 @@
 package data;
 
+import java.util.ArrayList;
 import static data.Constants.*;
 
 public class Trainer
@@ -113,6 +114,16 @@ public class Trainer
 		else if (trnKind == 3)
 			for (int i = 0; i < newMoves.length; i++)
 				this.party[partyPos][3+i] = newMoves[i];
+	}
+
+	public void setMoves(int partyPos, ArrayList<Move> newMoves)
+	{
+		if (trnKind == 1)
+			for (int i = 0; i < newMoves.size(); i++)
+				this.party[partyPos][2+i] = newMoves.get(i).getIndex();
+		else if (trnKind == 3)
+			for (int i = 0; i < newMoves.size(); i++)
+				this.party[partyPos][3+i] = newMoves.get(i).getIndex();
 	}
 	
 	public void setParty(byte[][] party)

@@ -1,11 +1,34 @@
 package engine;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import static java.lang.Math.*;
 import static data.Constants.*;
+
 import data.Move;
+import data.PokemonGame;
 
 class MoveAnalyser
 {
 	protected Move[] moves;
+
+	protected enum Role
+	{
+		DEFAULT,
+		PHYOFF,
+		SPEOFF,
+		MIXED,
+		PHYSWEEPER,
+		SPESWEEPER,
+		PHYTANK,
+		SPETANK,
+		SUPPORT,
+		STALLER,
+		SLEEP_TALKER,
+		DREAM_EATER,
+		CURSER,
+		FLAILER;
+	}
 
 	protected enum MoveEffect 
 	{
@@ -15,8 +38,9 @@ class MoveAnalyser
 	    DREAM_EATER  ((byte) 0x08, true),
 	    ATKUP1       ((byte) 0x0A, true),
 	    DEFUP1       ((byte) 0x0B, false),
-	    SATKUP1      ((byte) 0x0C, true),
-	    EVAUP1       ((byte) 0x10, false),
+	    SPDUP1       ((byte) 0x0C, false),
+	    SATKUP1      ((byte) 0x0D, true),
+	    EVAUP1       ((byte) 0x10, true),
 	    NEVER_MISS   ((byte) 0x11, false),
 	    ATKDOWN1     ((byte) 0x12, false),
 	    DEFDOWN1     ((byte) 0x13, false),
@@ -69,6 +93,8 @@ class MoveAnalyser
 	    PERISH_SONG  ((byte) 0x72, true),
 	    SANDSTORM    ((byte) 0x73, true),
 	    ENDURE       ((byte) 0x74, true),
+	    SWAGGER      ((byte) 0x74, true),
+	    ATTRACT      ((byte) 0x78, true),
 	    RETURN       ((byte) 0x79, true),
 	    PRESENT      ((byte) 0x7A, false),
 	    FRUSTRATION  ((byte) 0x7B, true),
@@ -83,9 +109,9 @@ class MoveAnalyser
 	    PSYCH_UP     ((byte) 0x8F, true),
 	    MIRROR_COAT  ((byte) 0x90, false),
 	    FUTURE_SIGHT ((byte) 0x94, true),
-		SOLARBEAM    ((byte) 0x97, false),
-        TELEPORT     ((byte) 0x99, false),
-        FLY_DIG      ((byte) 0x99, true);
+		SOLARBEAM    ((byte) 0x97, true),
+        TELEPORT     ((byte) 0x99, true),
+        FLY_DIG      ((byte) 0x9B, true);
 
 	    private final byte index;
 	    private final boolean situational;
@@ -122,7 +148,8 @@ class MoveAnalyser
 			case (byte) 0x08: return MoveEffect.DREAM_EATER; 
 			case (byte) 0x0A: return MoveEffect.ATKUP1; 
 			case (byte) 0x0B: return MoveEffect.DEFUP1; 
-			case (byte) 0x0C: return MoveEffect.SATKUP1; 
+			case (byte) 0x0C: return MoveEffect.SPDUP1; 
+			case (byte) 0x0D: return MoveEffect.SATKUP1; 
 			case (byte) 0x10: return MoveEffect.EVAUP1; 
 			case (byte) 0x11: return MoveEffect.NEVER_MISS; 
 			case (byte) 0x12: return MoveEffect.ATKDOWN1; 
@@ -176,6 +203,8 @@ class MoveAnalyser
 			case (byte) 0x72: return MoveEffect.PERISH_SONG; 
 			case (byte) 0x73: return MoveEffect.SANDSTORM; 
 			case (byte) 0x74: return MoveEffect.ENDURE; 
+			case (byte) 0x76: return MoveEffect.SWAGGER; 
+			case (byte) 0x78: return MoveEffect.ATTRACT; 
 			case (byte) 0x79: return MoveEffect.RETURN; 
 			case (byte) 0x7A: return MoveEffect.PRESENT; 
 			case (byte) 0x7B: return MoveEffect.FRUSTRATION; 
@@ -195,5 +224,218 @@ class MoveAnalyser
 			case (byte) 0x9B: return MoveEffect.FLY_DIG; 
 			default: 		  return MoveEffect.NO_EFFECT;
 		}
+	}
+
+	public static Comparator<Move> MovePowerCmp = new Comparator<Move>() 
+	{
+		public int compare(Move m1, Move m2) 
+		{
+
+		int movePower1 = m1.getCalcPower();
+		int movePower2 = m2.getCalcPower();
+
+		/*For descending order*/
+		return movePower2-movePower1;
+		}
+	};
+
+	public static Comparator<Move> MoveTierCmp = new Comparator<Move>() 
+	{
+		public int compare(Move m1, Move m2) 
+		{
+
+		int moveTier1 = m1.getTier();
+		int moveTier2 = m2.getTier();
+
+		/*For descending order*/
+		return moveTier2-moveTier1;
+		}
+	};
+
+	ArrayList<Move> getLevelUpMoves(PokemonGame mon, int lvl, PokemonGame[] mons)
+	{
+		ArrayList<Move> movepool = new ArrayList<Move>();
+		byte[][] lvlMoves = mon.getMovesUpToLevel(mons, valueToByte(lvl));
+
+		for (int i = 0; i < lvlMoves.length; i++)
+		{			
+			for (byte m : lvlMoves[i])
+			{
+				int index = byteToValue(m);
+				Move thisMove = moves[index- 1];
+
+				if (!movepool.contains(thisMove))
+					movepool.add(thisMove);
+			}
+		}
+
+		return movepool;
+	}
+
+	ArrayList<Move> getMovepool(PokemonGame mon, int lvl, PokemonGame[] mons, Move[] movesTM)
+	{
+		ArrayList<Move> movepool = getLevelUpMoves(mon, lvl, mons);
+
+		int maxTier = levelTier(lvl);
+
+		boolean[] moveComp = mon.getCompatibilities();
+
+		for (int i = 0; i < movesTM.length; i++) // run through all the TM moves
+		{
+			if (!moveComp[i]) // if not compatible, skip
+				continue;
+
+			if (movesTM[i].getTier() > maxTier)
+				continue;
+				
+			if (!movepool.contains(movesTM[i]))
+				movepool.add(movesTM[i]);
+		}
+
+
+		byte[] eggMoves = mon.getEggMovesCarry(); // egg moves it can carry
+
+		for (byte m : eggMoves)
+		{			
+			int index = byteToValue(m);
+			Move thisMove = moves[index-1];
+
+			if (thisMove.getTier() > maxTier)
+				continue;
+
+			if (!movepool.contains(thisMove))
+				movepool.add(thisMove);
+		}
+
+
+		return movepool;
+	}
+
+	protected ArrayList<Move> getPhysical(ArrayList<Move> movepool)
+	{
+		ArrayList<Move> movesPhy = new ArrayList<Move>();
+
+		for (Move m : movepool)
+			if (m.getCat() == MOVE_PHYSICAL_CATEGORY && m.getCalcPower() > 0)
+				movesPhy.add(m);
+
+		return movesPhy;
+	}
+
+	protected ArrayList<Move> getSpecial(ArrayList<Move> movepool)
+	{
+		ArrayList<Move> movesSpe = new ArrayList<Move>();
+
+		for (Move m : movepool)
+			if (m.getCat() == MOVE_SPECIAL_CATEGORY && m.getCalcPower() > 0)
+				movesSpe.add(m);
+		
+		return movesSpe;
+	}
+
+	protected ArrayList<Move> getStatus(ArrayList<Move> movepool)
+	{
+		ArrayList<Move> movesSta = new ArrayList<Move>();
+
+		for (Move m : movepool)
+			if (m.getCat() == MOVE_OTHER_CATEGORY || m.getCalcPower() == 0)
+				movesSta.add(m);
+		
+		return movesSta;
+	}
+
+	protected boolean hasMoveEffect(ArrayList<Move> movepool, MoveEffect eff)
+	{
+		boolean test = false;
+
+		for (Move m : movepool)
+		{
+			MoveEffect curEff = getEffect(m);
+
+			if (curEff == eff)
+			{
+				test = true;
+				break;
+			}
+		}
+
+		return test;
+	}
+
+	boolean checkSTAB(PokemonGame mon, Move move)
+	{
+		Type[] monTypes = mon.getTypes();
+		Type moveType = move.getType();
+
+		return checkSTAB(monTypes, moveType);
+	}
+
+	boolean checkSTAB(Type[] monTypes, Type moveType)
+	{
+		return (monTypes[0] == moveType) || (monTypes[1] == moveType);
+	}
+
+	boolean checkSTAB(Type monType, Move move)
+	{
+		return (monType == move.getType());
+	}
+
+	boolean hasNonSituational(ArrayList<Move> movepool)
+	{
+		// check if a set of moves have at least one non situational move
+		boolean test = false;
+		for (Move m : movepool)
+			if (!getEffect(m).situational())
+			{
+				test = true;
+				break;
+			}
+		return test;
+	}
+
+	static int levelTier(int lvl)
+	{
+		int maxTier = 0;
+
+		if (lvl <= 20)
+		{
+			maxTier = (int) floor((N_MOVE_TIERS - 1)/3);
+		}
+		else if (lvl <= 30)
+		{
+			maxTier = (int) floor((N_MOVE_TIERS - 1)/2);
+		}
+		else
+		{
+			maxTier = N_MOVE_TIERS - 1;
+		}
+
+		return maxTier;
+	}
+
+	protected boolean isSupportMove(Move move)
+	{
+		MoveEffect eff = getEffect(move);
+
+		return
+		(
+			(eff == MoveEffect.CAUSE_SLP)    ||
+			(eff == MoveEffect.LIGHT_SCREEN) ||
+			(eff == MoveEffect.CAUSE_CNF)    ||
+			(eff == MoveEffect.REFLECT)      ||
+			(eff == MoveEffect.CAUSE_PRZ)    ||
+			(eff == MoveEffect.LEECH_SEED)   ||
+			(eff == MoveEffect.ENCORE)		 ||
+			(eff == MoveEffect.HEAL_BELL)	 ||
+			(eff == MoveEffect.SPIKES)
+		);
+	}
+
+	protected boolean isFixed(Move move)
+	{
+		MoveEffect eff = getEffect(move);
+
+		// return true if it is a fixed power move
+		return (eff == MoveEffect.FIXED_DAMAGE || eff == MoveEffect.FUTURE_SIGHT);
 	}
 }
