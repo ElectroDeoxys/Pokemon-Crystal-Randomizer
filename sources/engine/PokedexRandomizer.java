@@ -55,7 +55,7 @@ class PokedexRandomizer
 		{
 			if (t == Type.NO_TYPE) continue;
 			
-			evoList.add(getRandomEvoLineType(monSorter, t, evoList));
+			evoList.add(getRandomEvoLineType(monSorter, t, evoList, false));
 			
 			for (int j = 0; j < evoLines[evoList.get(t.intIndex())].length; j++)
 				nDexMons++;
@@ -108,17 +108,21 @@ class PokedexRandomizer
 		return randEvoLine;
 	}
 	
-	private int getRandomEvoLineType(PokemonSorter monSorter, Type type, ArrayList<Integer> curEvoList)
+	private int getRandomEvoLineType(PokemonSorter monSorter, Type type, ArrayList<Integer> curEvoList, boolean includeLegendaries)
 	{
 		// returns a random evolution line that has given type with no repeats
 		int[] typeArray = monSorter.getPokemonOfType(type);
 		int randEvoLine;
+		int randMon;
 		
 		do
 		{
-			int randMon = typeArray[(int) floor(random() * typeArray.length)];
+			randMon = typeArray[(int) floor(random() * typeArray.length)];
 			randEvoLine = monSorter.findEvoLineContaining(randMon);
-		} while (curEvoList.contains(randEvoLine));
+		} while (curEvoList.contains(randEvoLine) 								||
+				 (monData[randMon-1].isLegendary() && !includeLegendaries) 		||
+				 (type == Type.NORMAL && monData[randMon-1].isNormalFlying()) 	||
+				 (type == Type.FLYING && monData[randMon-1].isBugFlying()));
 		
 		return randEvoLine;
 	}
@@ -222,5 +226,13 @@ class PokedexRandomizer
 	byte[][][] getAllPalettes()
 	{
 		return pal;
+	}
+
+	void printPokedex(Names names)
+	{
+		for (int i = 0; i < N_POKEMON; i++)
+		{
+			System.out.println(names.pokemon(i));
+		}
 	}
 }

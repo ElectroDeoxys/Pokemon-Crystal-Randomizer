@@ -45,14 +45,14 @@ class Main
 			int starterKind = 1; // kinds of starters (0 = totally random, 1 = at least 1 evolution, 2 = 3-stage only)
 			
 			boolean routeWSimilar = true; // route Pokemon with similar strength Pokemon
-			boolean routeNoLeg = true; // whether to have no legendary in wild or yes
-			boolean routeType = true; // whether to have routes with type-specific Pokemon
+			boolean routeNoLeg 	  = true; // whether to have no legendary in wild or yes
+			boolean routeType 	  = true; // whether to have routes with type-specific Pokemon
 			
 			boolean trainerWSimilar = true; // trainer Pokemon with similar strength Pokemon
-			int typeExpert = 2; // typeExpert (0 = no type specialists, 1 = preserve type specialists, 2 = randomize type specialists)
-			boolean persRival = true; // have a Rival team with persistent Pokemon or not
-			boolean trainerNoLeg = false; // whether to have no legendary in Trainer parties or yes
-			boolean extraCust = true; // whether to have customized Trainer Pokemon moves
+			int typeExpert 			= 2; // typeExpert (0 = no type specialists, 1 = preserve type specialists, 2 = randomize type specialists)
+			boolean persRival 		= true; // have a Rival team with persistent Pokemon or not
+			boolean trainerNoLeg 	= false; // whether to have no legendary in Trainer parties or yes
+			boolean extraCust 		= true; // whether to have customized Trainer Pokemon moves
 			
 			/////////////////////////////////////
 			// ROM patching
@@ -116,6 +116,7 @@ class Main
 			// console log
 			/////////////////////////////////////
 
+			dexRand.printPokedex(names);
 			//trainerEditor.printCustTeams(names);
 			//moveSorter.printMoveTiers(names);
 			

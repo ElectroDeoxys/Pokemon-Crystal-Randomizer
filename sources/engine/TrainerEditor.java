@@ -28,6 +28,9 @@ class TrainerEditor
 		// adds up to 3 new Pokemon in each roster
 		// new Pokemon are same tier as the other established ones (randomly picked)
 		
+		int partyAddMax = 0;
+		int levelAdd = 0;
+
 		for (int i : INDEX_KANTO_TRAINERS)
 		{
 			byte kind = trainers[i].getKind();
@@ -39,7 +42,7 @@ class TrainerEditor
 			byte[][] moves = new byte[size][4];
 			int[] partyTiers = new int[size];
 			
-			int newSize = (int) min(size + floor(random() * 3), 6);
+			int newSize = (int) min(size + floor(random() * partyAddMax), 6);
 			int[] newLvl = new int[newSize];
 			int[] newParty = new int[newSize];
 			byte[] newItems = new byte[newSize];
@@ -49,7 +52,7 @@ class TrainerEditor
 			{
 				byte[] b = trainers[i].getPokeBytes(j);
 				
-				lvl[j] = min((byteToValue(b[0]) + 15), 100);
+				lvl[j] = min((byteToValue(b[0]) + levelAdd), 100);
 				party[j] = b[1];
 				partyTiers[j] = monSorter.getPokemonOldTier(byteToValue(party[j]), false);
 				

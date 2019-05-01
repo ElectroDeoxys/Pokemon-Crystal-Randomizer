@@ -171,6 +171,16 @@ public abstract class Pokemon
 		
 		return out;
 	}
+
+	public boolean isNormalFlying()
+	{
+		return ((types[0] == Type.NORMAL && types[1] == Type.FLYING));
+	}
+
+	public boolean isBugFlying()
+	{
+		return ((types[0] == Type.BUG    && types[1] == Type.FLYING));
+	}
 	
 	public byte[] getName()
 	{

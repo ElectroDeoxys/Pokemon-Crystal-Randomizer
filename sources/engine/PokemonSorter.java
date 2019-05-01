@@ -99,14 +99,14 @@ class PokemonSorter
 			
 			typeHolder.get(typeOfMon[0].intIndex()).add(mons[i].getIntIndex());
 			
-			if (!(typeOfMon[0] == Type.NORMAL && typeOfMon[1] == Type.FLYING)) // don't count Normal/Flying as Normal-type
+			if (!(mons[i].isNormalFlying())) // don't count Normal/Flying as Normal-type
 				typeTierHolder.get(typeOfMon[0].intIndex()).get(indexTypeTier).add(mons[i].getIntIndex());
 			
 			if (typeOfMon[0] != typeOfMon[1]) // if dual-type
 			{
 				typeHolder.get(typeOfMon[1].intIndex()).add(mons[i].getIntIndex());
 				
-				if (!(typeOfMon[0] == Type.BUG && typeOfMon[1] == Type.FLYING)) // don't count Bug/Flying as Flying-type
+				if (!(mons[i].isBugFlying())) // don't count Bug/Flying as Flying-type
 					typeTierHolder.get(typeOfMon[1].intIndex()).get(indexTypeTier).add(mons[i].getIntIndex());
 			}
 			
