@@ -1,8 +1,5 @@
 package data;
 
-import java.util.ArrayList;
-import static java.lang.Math.*;
-
 import static data.Constants.*;
 
 public class PokemonData extends Pokemon
@@ -45,6 +42,7 @@ public class PokemonData extends Pokemon
 	// Return value methods
 	/////////////////////////////////////////////
 	
+        @Override
 	public int getIntIndex()
 	{
 		return getTrueIndex();
@@ -55,6 +53,7 @@ public class PokemonData extends Pokemon
 		return this.evoIndex;
 	}
 
+        @Override
 	public int[] getEvoInt()
 	{
 		return getEvoIndex();
@@ -65,6 +64,7 @@ public class PokemonData extends Pokemon
 		return this.preEvoIndex;
 	}
 
+        @Override
 	public int[] getPreEvoInt()
 	{
 		return getPreEvoIndex();
