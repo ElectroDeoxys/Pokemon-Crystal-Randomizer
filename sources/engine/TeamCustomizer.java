@@ -100,7 +100,6 @@ class TeamCustomizer extends MoveAnalyser
         // calculate the weighted probabilities of getting each role according to Pokemon's attributes
         ArrayList<Double> prob = new ArrayList<>();
         ArrayList<Double> points = new ArrayList<>();
-        int size = roles.size();
         double totalPoints = 0;
 
         int hp = mon.getHP();
@@ -119,45 +118,45 @@ class TeamCustomizer extends MoveAnalyser
             switch (r)
             {
                 case PHYOFF:
-                    calc += (atk - statAvrg) / (double) 10;
+                    calc += (atk - statAvrg) / (double) 1;
                     break;
                 case SPEOFF:
-                    calc += (satk - statAvrg) / (double) 10;
+                    calc += (satk - statAvrg) / (double) 1;
                     break;
                 case MIXED:
-                    calc += (atk - statAvrg) / (double) 20;
-                    calc += (satk - statAvrg) / (double) 20;
+                    calc += (atk - statAvrg) / (double) 2;
+                    calc += (satk - statAvrg) / (double) 2;
                     break;
                 case PHYSWEEPER:
                 case FLAILER:
-                    calc += (atk - statAvrg) / (double) 20;
-                    calc += (spd - statAvrg) / (double) 20;
+                    calc += (atk - statAvrg) / (double) 2;
+                    calc += (spd - statAvrg) / (double) 2;
                     break;
                 case SPESWEEPER:
                 case DREAM_EATER:
-                    calc += (satk - statAvrg) / (double) 20;
-                    calc += (spd - statAvrg) / (double) 20;
+                    calc += (satk - statAvrg) / (double) 2;
+                    calc += (spd - statAvrg) / (double) 2;
                     break;
                 case PHYTANK:
                 case CURSER:
-                    calc += (atk - statAvrg) / (double) 30;
-                    calc += (def - statAvrg) / (double) 30;
-                    calc += (sdef - statAvrg) / (double) 30;
+                    calc += (atk - statAvrg) / (double) 3;
+                    calc += (def - statAvrg) / (double) 3;
+                    calc += (sdef - statAvrg) / (double) 3;
                     break;
                 case SPETANK:
-                    calc += (satk - statAvrg) / (double) 30;
-                    calc += (def - statAvrg) / (double) 30;
-                    calc += (sdef - statAvrg) / (double) 30;
+                    calc += (satk - statAvrg) / (double) 3;
+                    calc += (def - statAvrg) / (double) 3;
+                    calc += (sdef - statAvrg) / (double) 3;
                     break;
                 case SUPPORT:
                 case STALLER:
-                    calc += (hp - statAvrg) / (double) 30;
-                    calc += (def - statAvrg) / (double) 30;
-                    calc += (sdef - statAvrg) / (double) 30;
+                    calc += (hp - statAvrg) / (double) 3;
+                    calc += (def - statAvrg) / (double) 3;
+                    calc += (sdef - statAvrg) / (double) 3;
                     break;
                 case SLEEP_TALKER:
-                    calc += (hp - statAvrg) / (double) 20;
-                    calc += max((atk - statAvrg), (satk - statAvrg)) / (double) 20;
+                    calc += (hp - statAvrg) / (double) 2;
+                    calc += max((atk - statAvrg), (satk - statAvrg)) / (double) 2;
                     break;
                 default:
                     calc = 1;
