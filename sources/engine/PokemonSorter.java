@@ -136,7 +136,7 @@ class PokemonSorter
                 // may have up to two pre-evolutions, so get to the bottom of the chain
                 if (mons[i].hasPre()) // if this Pokemon has a pre-evolution
                 {
-                    System.out.println(mons[i].getTrueIndex());
+                    //System.out.println(mons[i].getTrueIndex());
                     int[] preEvo = mons[i].getPreEvoInt();
                     int preEvoIndex = preEvo[0] - 1;
 

@@ -21,12 +21,14 @@ class PokedexRandomizer
     private byte[][][] pal;
 
     private int[] indexLookup;
+    private PokemonSorter monSorter;
 
     PokedexRandomizer(PokemonData[] monData, Sprite[][] spr, byte[][][] palData)
     {
         this.monData = monData;
         this.spr = spr;
         this.palData = palData;
+        monSorter = new PokemonSorter(monData);
 
         indexLookup = new int[N_POKEMON_DATA + 1];
         for (int i = 0; i < N_POKEMON_DATA + 1; i++)
@@ -46,11 +48,18 @@ class PokedexRandomizer
         ArrayList<Integer> dexList = new ArrayList<>();
         ArrayList<Integer> evoList = new ArrayList<>();
 
-        PokemonSorter monSorter = new PokemonSorter(monData);
         int[][] evoLines = monSorter.getEvoLines();
         int nEvos = evoLines.length;
+        
         int nDexEvos = 0; // number of evolution lines in the Pokedex
         int nDexMons = 0;
+        
+        ArrayList<Integer> availableLines = new ArrayList<>();
+        
+        for (int i = 0; i < evoLines.length; i++)
+        {
+            availableLines.add(i);
+        }
 
         // first ensure there are evo-lines with each type
         for (Type t : Type.values())
@@ -60,12 +69,10 @@ class PokedexRandomizer
                 continue;
             }
 
-            evoList.add(getRandomEvoLineType(monSorter, t, evoList, false));
-
-            for (int j = 0; j < evoLines[evoList.get(t.intIndex())].length; j++)
-            {
-                nDexMons++;
-            }
+            int randEvoLine = getRandomEvoLineType(t, availableLines, false);
+            evoList.add(randEvoLine);
+            availableLines.remove(new Integer(randEvoLine));
+            nDexMons += evoLines[randEvoLine].length;
 
             nDexEvos++;
         }
@@ -73,20 +80,17 @@ class PokedexRandomizer
         // fill the rest of the dex
         while (nDexMons < N_POKEMON)
         {
-            int randEvoLine = getRandomEvoLine(evoList, nEvos);
+            int randEvoLine;
 
             do // only get the ones that don't exceed the number of Pokedex slots
             {
-                randEvoLine = getRandomEvoLine(evoList, nEvos);
+                randEvoLine = getRandomEvoLine(availableLines);
             }
             while (evoLines[randEvoLine].length > N_POKEMON - nDexMons);
 
             evoList.add(randEvoLine);
-
-            for (int i = 0; i < evoLines[evoList.get(nDexEvos)].length; i++)
-            {
-                nDexMons++;
-            }
+            availableLines.remove(new Integer(randEvoLine));
+            nDexMons += evoLines[randEvoLine].length;
 
             nDexEvos++;
         }
@@ -107,21 +111,13 @@ class PokedexRandomizer
         return convertIntArray(dexList.toArray(new Integer[0]));
     }
 
-    private int getRandomEvoLine(ArrayList<Integer> curEvoList, int nEvos)
+    private int getRandomEvoLine(ArrayList<Integer> availableLines)
     {
         // returns a random evolution line with no repeats
-        int randEvoLine;
-
-        do
-        {
-            randEvoLine = (int) floor(random() * nEvos);
-        }
-        while (curEvoList.contains(randEvoLine));
-
-        return randEvoLine;
+        return availableLines.get((int) floor(random() * availableLines.size()));
     }
 
-    private int getRandomEvoLineType(PokemonSorter monSorter, Type type, ArrayList<Integer> curEvoList, boolean includeLegendaries)
+    private int getRandomEvoLineType(Type type, ArrayList<Integer> availableLines, boolean includeLegendaries)
     {
         // returns a random evolution line that has given type with no repeats
         int[] typeArray = monSorter.getPokemonOfType(type);
@@ -133,7 +129,7 @@ class PokedexRandomizer
             randMon = typeArray[(int) floor(random() * typeArray.length)];
             randEvoLine = monSorter.findEvoLineContaining(randMon);
         }
-        while (curEvoList.contains(randEvoLine)
+        while (!availableLines.contains(randEvoLine)
                 || (monData[randMon - 1].isLegendary() && !includeLegendaries)
                 || (type == Type.NORMAL && monData[randMon - 1].isNormalFlying())
                 || (type == Type.FLYING && monData[randMon - 1].isBugFlying()));
