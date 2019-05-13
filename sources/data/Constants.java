@@ -30,7 +30,7 @@ public class Constants
         private final byte byteIndex;
         private final int intIndex;
 
-        Type(byte byteIndex, int intIndex)
+        private Type(byte byteIndex, int intIndex)
         {
             this.byteIndex = byteIndex;
             this.intIndex = intIndex;

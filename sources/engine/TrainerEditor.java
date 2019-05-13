@@ -33,8 +33,6 @@ class TrainerEditor
 
         for (int i : INDEX_KANTO_TRAINERS)
         {
-            byte kind = trainers[i].getKind();
-
             int size = trainers[i].getPartySize();
             int[] lvl = new int[size];
             byte[] party = new byte[size];
@@ -61,14 +59,14 @@ class TrainerEditor
 
                 int a = 0; // keep track of indexes to look into
 
-                if (((kind >> 1) & 0x01) == (byte) 0x1) // has items
+                if (trainers[i].hasItems()) // has items
                 {
                     items[j] = b[2];
                     newItems[j] = items[j];
                     a++;
                 }
 
-                if ((kind & 0x01) == (byte) 0x1) // has moves
+                if (trainers[i].hasMoves()) // has moves
                 {
                     for (int k = 0; k < 4; k++)
                     {
@@ -89,11 +87,11 @@ class TrainerEditor
                 int randTier = partyTiers[(int) floor(random() * size)]; // get a random tier from the original party
                 newParty[j] = monSorter.getSameTier(randTier, -1, Type.NO_TYPE, true, false, false);
 
-                if (((kind >> 1) & 0x01) == (byte) 0x1) // has items
+                if (trainers[i].hasItems()) // has items
                 {
                     newItems[j] = (byte) 0x00; // no item
                 }
-                if ((kind & 0x01) == (byte) 0x1) // has moves
+                if (trainers[i].hasMoves()) // has moves
                 {
                     newMoves[j] = getMoveset(moveSorter, newParty[j], valueToByte(newLvl[j]), false);
                 }
@@ -107,12 +105,12 @@ class TrainerEditor
                 slotList.add(valueToByte(newLvl[j]));
                 slotList.add(valueToByte(newParty[j]));
 
-                if (((kind >> 1) & 0x01) == (byte) 0x1) // has items
+                if (trainers[i].hasItems()) // has items
                 {
                     slotList.add(newItems[j]);
                 }
 
-                if ((kind & 0x01) == (byte) 0x1) // has moves
+                if (trainers[i].hasMoves()) // has moves
                 {
                     for (byte curMove : newMoves[j])
                     {
@@ -342,36 +340,17 @@ class TrainerEditor
         return trainers;
     }
 
-    void applyMovesets(MoveSorter moveSorter, boolean extraCust)
+    void applyMovesets(PokemonGame[] mons, TeamCustomizer teamCust)
     {
         // scaling level or changing Trainer Pokemon messes with custom moves
         // so this function must be called after applying one of those changes
         // for coherent movesets
-
-        for (int i = 0; i < N_TRAINERS; i++)
-        {
-            byte kind = trainers[i].getKind();
-
-            if (kind != 1 && kind != 3)
-            {
-                continue; // no custom moves
-            }
-            for (int j = 0; j < trainers[i].getPartySize(); j++)
-            {
-                byte lvl = trainers[i].getLvl(j);
-                byte[] newMoves = getMoveset(moveSorter, byteToValue(trainers[i].getPokeByte(j)), lvl, extraCust);
-                trainers[i].setMoves(j, newMoves);
-            }
-        }
-    }
-
-    void applyMovesets(PokemonGame[] mons, TeamCustomizer teamCust)
-    {
+        
         for (Trainer t : trainers)
         {
-            byte kind = t.getKind();
+            Trainer.Kind kind = t.getKind();
 
-            if (kind != 1 && kind != 3)
+            if (kind != Trainer.Kind.WMOVES && kind != Trainer.Kind.WMOVESITEMS)
             {
                 continue; // no custom moves
             }
@@ -580,14 +559,14 @@ class TrainerEditor
 
             System.out.println(names.pokemon(b[1]) + " lvl " + byteToValue(b[0]));
 
-            if (t.getKind() == 1)
+            if (t.getKind() == Trainer.Kind.WMOVES)
             {
                 for (int j = 0; j < 4; j++)
                 {
                     System.out.println(" - " + names.move(b[2 + j]));
                 }
             }
-            else if (t.getKind() == 3)
+            else if (t.getKind() == Trainer.Kind.WMOVESITEMS)
             {
                 for (int j = 0; j < 4; j++)
                 {
@@ -611,7 +590,7 @@ class TrainerEditor
     {
         for (int i = 0; i < trainers.length; i++)
         {
-            if (trainers[i].getKind() != 1 && trainers[i].getKind() != 3)
+            if (!trainers[i].hasMoves())
             {
                 continue;
             }

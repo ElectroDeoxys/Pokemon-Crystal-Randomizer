@@ -83,7 +83,7 @@ class RomWriter
 
         buffer.put(trainer.getName());
         buffer.put((byte) 0x50); // name terminator
-        buffer.put(trainer.getKind());
+        buffer.put(trainer.getKind().getByte());
         buffer.put(trainer.getStatExp());
 
         for (int i = 0; i < trainer.getPartySize(); i++)
