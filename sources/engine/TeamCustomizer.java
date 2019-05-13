@@ -70,13 +70,15 @@ class TeamCustomizer extends MoveAnalyser
     {
         // chooses a random role
         ArrayList<Double> prob = calculateProbabilities(mon, roles);
-        Double cumulative = prob.get(0);
+        Double cumulative = 0.0;
         Double r = random();
         int i = 0;
         Role chosenRole = null;
 
         for (Double p : prob)
         {
+            cumulative += p;
+            
             if (r < cumulative)
             {
                 chosenRole = roles.get(i);
@@ -84,7 +86,6 @@ class TeamCustomizer extends MoveAnalyser
             }
 
             i++;
-            cumulative += p;
         }
 
         if (chosenRole == null) // failsafe
