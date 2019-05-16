@@ -105,8 +105,8 @@ class Main
             // console log
             /////////////////////////////////////
             
-            dexRand.printPokedex(names);
-            //trainerEditor.printCustTeams(names);
+            //dexRand.printPokedex(names);
+            trainerEditor.printCustTeams(names);
             //moveSorter.printMoveTiers(names);
 
             /////////////////////////////////////

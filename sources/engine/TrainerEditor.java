@@ -163,6 +163,13 @@ class TrainerEditor
             {
                 continue; // skip trainers handled afterwards
             }
+            
+            if (trainers[i].getMaxLvl() < MIN_LEVEL_CUST_MOVES)
+                trainers[i].removeCustMoves();
+            
+            if (i >= INDEX_TRAINER_COOLTRAINER[0] && i <= INDEX_TRAINER_COOLTRAINER[1])
+                trainers[i].addCustMoves();
+            
             for (int j = 0; j < trainers[i].getPartySize(); j++)
             {
                 if (withSimilar)
@@ -174,6 +181,8 @@ class TrainerEditor
                 {
                     trainers[i].setPoke(j, valueToByte((int) floor(N_POKEMON * random()) + 1));
                 }
+                
+                
             }
         }
 

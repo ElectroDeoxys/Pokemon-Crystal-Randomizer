@@ -99,6 +99,16 @@ class RomWriter
     {
         int pos = OFFSET_TRAINERS;
         int ptrPos = OFFSET_TRAINERS_POINTERS;
+        
+        // clear bank section and fill it with 0x00
+        int availableSpace = 0x4000 - (OFFSET_TRAINERS % 0x4000);
+        ByteBuffer bufferEmpty = ByteBuffer.allocate(availableSpace);
+        for (int j = 0; j < availableSpace; j++)
+        {
+            bufferEmpty.put((byte) 0x00);
+        }
+
+        writeToRom(ch, bufferEmpty, OFFSET_TRAINERS);
 
         for (int i = 0; i < TRAINER_GROUPS.length; i++) // cycle trainer groups
         {

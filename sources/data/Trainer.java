@@ -112,6 +112,19 @@ public class Trainer
         return this.party[partyPos][0];
     }
     
+    public int getMaxLvl()
+    {
+        int maxLvl = 0;
+        
+        for (byte[] partySlot : party)
+        {
+            int curLvl = byteToValue(partySlot[0]);
+            maxLvl = (maxLvl < curLvl) ? curLvl : maxLvl;
+        }
+        
+        return maxLvl;
+    }
+    
     public boolean hasMoves()
     {
         return (this.trnKind == Kind.WMOVES || this.trnKind == Kind.WMOVESITEMS);
@@ -217,6 +230,34 @@ public class Trainer
             }
             setParty(newParty);
             trnKind = Kind.WITEMS;
+        }
+    }
+    
+    public void addCustMoves()
+    {
+        if (trnKind == Kind.NONE)
+        {
+            byte[][] newParty = new byte[party.length][6];
+            for (int i = 0; i < party.length; i++)
+            {
+                System.arraycopy(party[i], 0, newParty[i], 0, 2);
+                for (int j = 0; j < 4; j++)
+                    newParty[i][2+j] = valueToByte(0); // placeholder move
+            }
+            setParty(newParty);
+            trnKind = Kind.WMOVES;
+        }
+        else if (trnKind == Kind.WITEMS)
+        {
+            byte[][] newParty = new byte[party.length][7];
+            for (int i = 0; i < party.length; i++)
+            {
+                System.arraycopy(party[i], 0, newParty[i], 0, 3);
+                for (int j = 0; j < 4; j++)
+                    newParty[i][3+j] = valueToByte(0); // placeholder move
+            }
+            setParty(newParty);
+            trnKind = Kind.WMOVESITEMS;
         }
     }
 }

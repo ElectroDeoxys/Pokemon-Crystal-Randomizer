@@ -261,6 +261,11 @@ public class Constants
     {
         249, 274
     }; // start and ending indexes (inclusive) of fishers
+    
+    public static final int[] INDEX_TRAINER_COOLTRAINER =
+    {
+        115, 155
+    }; // start and ending indexes (inclusive) of fishers
 
     public static final int[][] INDEX_GYM_TRAINERS =
     {
@@ -378,7 +383,8 @@ public class Constants
     public static final int STARTER_BST = 350; // maximum base stat total of starter Pokemon
     public static final int OTHER_METHODS_LEVEL = 40; // level at which the evolutionary methods other than leveling up cause evolution
     public static final int OTHER_METHODS_LEVEL_LOWER = 20; // for Pokemon that evolve into Pokemon that can still evolve
-
+    public static final int MIN_LEVEL_CUST_MOVES = 30; // minimum level at which non-special trainers can have custom movesets
+    
     public static int byteToValue(byte x)
     {
         int res = (int) x;
