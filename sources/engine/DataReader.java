@@ -172,8 +172,8 @@ class DataReader
             /////////////////////////////////////
             pos = posEvoMoves; // set position to second set
 
-            ArrayList<Byte[]> evoList = new ArrayList<Byte[]>();
-            ArrayList<Integer> evoIndexList = new ArrayList<Integer>();
+            ArrayList<Byte[]> evoList = new ArrayList<>();
+            ArrayList<Integer> evoIndexList = new ArrayList<>();
 
             if (readByteFromData(chEvoMoves, pos) == (byte) 0x00) // no evolutions
             {
@@ -237,7 +237,7 @@ class DataReader
 
             pos++; // position for moves	
 
-            ArrayList<Byte[]> moveList = new ArrayList<Byte[]>();
+            ArrayList<Byte[]> moveList = new ArrayList<>();
 
             while (readByteFromData(chEvoMoves, pos) != (byte) 0x00) // read moves
             {
@@ -290,7 +290,7 @@ class DataReader
                 continue; // don't process Pokemon with no egg moves
             }
 
-            ArrayList<Byte> eggMoveList = new ArrayList<Byte>();
+            ArrayList<Byte> eggMoveList = new ArrayList<>();
 
             while (readByteFromData(chEggMoves, pos) != (byte) 0xFF) // read moves
             {

@@ -778,16 +778,10 @@ class TeamCustomizer extends MoveAnalyser
     {
         ArrayList<Move> moveset = new ArrayList<>();
 
-        int count = 0;
-
         for (Move m : movepool)
         {
             moveset.add(m);
-            count++;
-            if (count == 4)
-            {
-                break;
-            }
+            if (moveset.size() == 4) break;
         }
 
         return moveset;
@@ -877,18 +871,6 @@ class TeamCustomizer extends MoveAnalyser
             }
         }
 
-    }
-
-    private void defaultMoveset(ArrayList<Move> moveset, ArrayList<Move> movepool)
-    {
-        for (Move m : movepool)
-        {
-            if (moveset.size() == 4)
-            {
-                break;
-            }
-            moveset.add(m);
-        }
     }
 
     private Move pickOffSetupMoveUp2(PokemonGame mon, ArrayList<Move> movesSta, boolean isSpecial)

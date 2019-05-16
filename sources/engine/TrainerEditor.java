@@ -13,13 +13,11 @@ class TrainerEditor
 {
     private Trainer[] trainers;
     private PokemonGame[] mons;
-    private PokemonSorter monSorter;
 
     TrainerEditor(RomReader romReader, PokemonGame[] mons) throws IOException
     {
         this.trainers = romReader.readRomTrainers();
         this.mons = mons;
-        this.monSorter = monSorter;
     }
 
     void buffKanto(PokemonSorter monSorter, MoveSorter moveSorter)
