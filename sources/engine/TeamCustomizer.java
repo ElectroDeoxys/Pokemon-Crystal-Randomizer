@@ -129,12 +129,10 @@ class TeamCustomizer extends MoveAnalyser
                     calc += (satk - statAvrg) / (double) 2;
                     break;
                 case PHYSWEEPER:
-                case FLAILER:
                     calc += (atk - statAvrg) / (double) 2;
                     calc += (spd - statAvrg) / (double) 2;
                     break;
                 case SPESWEEPER:
-                case DREAM_EATER:
                     calc += (satk - statAvrg) / (double) 2;
                     calc += (spd - statAvrg) / (double) 2;
                     break;
@@ -158,6 +156,14 @@ class TeamCustomizer extends MoveAnalyser
                 case SLEEP_TALKER:
                     calc += (hp - statAvrg) / (double) 2;
                     calc += max((atk - statAvrg), (satk - statAvrg)) / (double) 2;
+                    break;
+                case DREAM_EATER:
+                    calc += (satk - statAvrg) / (double) 1;
+                    break;
+                case FLAILER:
+                    calc += (atk - statAvrg) / (double) 3;
+                    calc += (spd - statAvrg) / (double) 3;
+                    calc += -(hp - statAvrg) / (double) 3;
                     break;
                 default:
                     calc = 1;
@@ -653,7 +659,11 @@ class TeamCustomizer extends MoveAnalyser
         // sleeping move and dream eater
         movesToAdd.add(pickMoveEffect(movesSta, MoveEffect.CAUSE_SLP));
         movesToAdd.add(pickMoveEffect(movesOff, MoveEffect.DREAM_EATER));
-
+        
+        Move moveOff = getStrongestMove(mon, movesOff, Type.PSYCHIC, false);
+        if (moveOff != null)
+            movesToAdd.add(moveOff);
+        
         addSupportMoves(movesToAdd, movesSta);
         fitMovesIn(movesToAdd, moveset);
 
@@ -786,8 +796,13 @@ class TeamCustomizer extends MoveAnalyser
 
         return moveset;
     }
+    
+    Move getStrongestMove(PokemonGame mon, ArrayList<Move> movepool, boolean includeSituational)
+    {
+        return getStrongestMove(mon, movepool, Type.NO_TYPE, includeSituational);
+    }
 
-    private Move getStrongestMove(PokemonGame mon, ArrayList<Move> movepool, boolean includeSituational)
+    private Move getStrongestMove(PokemonGame mon, ArrayList<Move> movepool, Type typeToExclude, boolean includeSituational)
     {
         // returns the move with highest power output
         Move maxMove = null;
@@ -795,19 +810,10 @@ class TeamCustomizer extends MoveAnalyser
 
         for (Move move : movepool)
         {
-            if (move.getCalcPower() == 0)
-            {
-                continue;
-            }
-
-            if (getEffect(move).situational() && !includeSituational)
-            {
-                continue;
-            }
-            if (getEffect(move) == MoveEffect.RECHARGE && !includeSituational)
-            {
-                continue;
-            }
+            if (move.getType() == typeToExclude) continue;
+            if (move.getCalcPower() == 0) continue;
+            if (getEffect(move).situational() && !includeSituational) continue;
+            if (getEffect(move) == MoveEffect.RECHARGE && !includeSituational) continue;
 
             int power = calculateRelativePower(mon, move);
 
