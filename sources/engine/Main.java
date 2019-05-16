@@ -94,7 +94,7 @@ class Main
             trainerEditor.buffKanto(monSorter, moveSorter);
             trainerEditor.scaleLevel((float) 1.0);
             trainerEditor.giveStatExp();
-            trainerEditor.randomizePokemon(monSorter, trainerWSimilar, typeExpert, persRival, trainerNoLeg);
+            trainerEditor.randomizePokemon(monSorter, trainerWSimilar, typeExpert, persRival, trainerNoLeg, extraCust);
             trainerEditor.kantoForceEvolved(monSorter);
 
             TeamCustomizer teamCust = new TeamCustomizer(moveEditor.getMoves(), moveSorter, names);

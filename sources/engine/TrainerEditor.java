@@ -148,7 +148,7 @@ class TrainerEditor
         }
     }
 
-    void randomizePokemon(PokemonSorter monSorter, boolean withSimilar, int typeExpert, boolean persRival, boolean noLeg)
+    void randomizePokemon(PokemonSorter monSorter, boolean withSimilar, int typeExpert, boolean persRival, boolean noLeg, boolean extraCust)
     {
         // typeExpert: 
         // 0 = no type specialists;
@@ -157,17 +157,17 @@ class TrainerEditor
 
         for (int i = 0; i < N_TRAINERS; i++)
         {
-            if (isSpecialTrainer(i, typeExpert, true, persRival))
+            if (isSpecialTrainer(i, typeExpert, true, persRival)) continue; // skip trainers handled afterwards
+            
+            if (extraCust)
             {
-                continue; // skip trainers handled afterwards
+                if (trainers[i].getMaxLvl() < MIN_LEVEL_CUST_MOVES)
+                    trainers[i].removeCustMoves();
+            
+                if (i >= INDEX_TRAINER_COOLTRAINER[0] && i <= INDEX_TRAINER_COOLTRAINER[1])
+                    trainers[i].addCustMoves();
             }
-            
-            if (trainers[i].getMaxLvl() < MIN_LEVEL_CUST_MOVES)
-                trainers[i].removeCustMoves();
-            
-            if (i >= INDEX_TRAINER_COOLTRAINER[0] && i <= INDEX_TRAINER_COOLTRAINER[1])
-                trainers[i].addCustMoves();
-            
+         
             for (int j = 0; j < trainers[i].getPartySize(); j++)
             {
                 if (withSimilar)
@@ -194,10 +194,8 @@ class TrainerEditor
 
                 for (int j = INDEX_TRAINER_CLASSES[i][0]; j <= INDEX_TRAINER_CLASSES[i][1]; j++) // cycle trainers
                 {
-                    if (isSpecialTrainer(j, typeExpert, false, persRival))
-                    {
-                        continue; // skip trainers handled afterwards
-                    }
+                    if (isSpecialTrainer(j, typeExpert, false, persRival)) continue; // skip trainers handled afterwards
+
                     for (int k = 0; k < trainers[j].getPartySize(); k++) // cycle party
                     {
                         int randMon;
@@ -326,6 +324,14 @@ class TrainerEditor
                         }
                     }
                 }
+            }
+        }
+        
+        if (!extraCust) // remove custom moves of all trainers
+        {
+            for (Trainer trainer : trainers)
+            {
+                trainer.removeCustMoves();
             }
         }
     }

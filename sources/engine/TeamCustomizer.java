@@ -137,7 +137,6 @@ class TeamCustomizer extends MoveAnalyser
                     calc += (spd - statAvrg) / (double) 2;
                     break;
                 case PHYTANK:
-                case CURSER:
                     calc += (atk - statAvrg) / (double) 3;
                     calc += (def - statAvrg) / (double) 3;
                     calc += (sdef - statAvrg) / (double) 3;
@@ -159,6 +158,11 @@ class TeamCustomizer extends MoveAnalyser
                     break;
                 case DREAM_EATER:
                     calc += (satk - statAvrg) / (double) 1;
+                    break;
+                case CURSER:
+                    calc += (atk - statAvrg) / (double) 3;
+                    calc += (sdef - statAvrg) / (double) 3;
+                    calc += -(spd - statAvrg) / (double) 3;
                     break;
                 case FLAILER:
                     calc += (atk - statAvrg) / (double) 3;
