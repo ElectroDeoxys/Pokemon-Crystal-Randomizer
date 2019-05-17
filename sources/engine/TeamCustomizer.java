@@ -169,6 +169,12 @@ class TeamCustomizer extends MoveAnalyser
                     calc += (spd - statAvrg) / (double) 3;
                     calc += -(hp - statAvrg) / (double) 3;
                     break;
+                case BELLY_DRUMMER:
+                    calc += (hp - statAvrg) / (double) 1;
+                    break;
+                case PERISH_TRAPPER:
+                    calc += (spd - statAvrg) / (double) 1;
+                    break;
                 default:
                     calc = 1;
             }
@@ -244,6 +250,12 @@ class TeamCustomizer extends MoveAnalyser
                 break;
             case FLAILER:
                 moveset = flailerMoveset(mon, maxTier, movesPhy, movesSta);
+                break;
+            case BELLY_DRUMMER:
+                moveset = bellyDrummerMoveset(mon, maxTier, movesPhy, movesSta);
+                break;
+            case PERISH_TRAPPER:
+                moveset = perishTrapperMoveset(mon, movesMix, movesSta);
                 break;
             default:
                 moveset = defaultMoveset(movepool);
@@ -676,51 +688,7 @@ class TeamCustomizer extends MoveAnalyser
 
     private ArrayList<Move> curserMoveset(PokemonGame mon, int maxTier, ArrayList<Move> movesPhy, ArrayList<Move> movesSta)
     {
-        ArrayList<Move> moveset = new ArrayList<>();
-        int curTier = maxTier;
-
-        do
-        {
-            basicOffenseMoveset(moveset, mon, curTier, movesPhy);
-            curTier--;
-        }
-        while (moveset.size() < 2 && curTier >= 0);
-
-        if (moveset.size() >= 2)
-        {
-            ArrayList<Move> movesToAdd = new ArrayList<>();
-
-            movesToAdd.add(pickMoveEffect(movesSta, MoveEffect.CURSE));
-
-            // first, healing
-            Move healMove = pickHealingMove(movesSta);
-            if (healMove != null)
-            {
-                movesToAdd.add(healMove);
-            }
-
-            // explosion
-            Move moveExp = pickMoveEffect(movesPhy, MoveEffect.EXPLODE);
-            if (moveExp != null && healMove == null)
-            {
-                movesToAdd.add(moveExp);
-            }
-
-            // second, status inflicting
-            Move statusMove = null;
-            if (movesToAdd.isEmpty() || moveset.size() + movesToAdd.size() < 3)
-            {
-                statusMove = pickStatusMove(movesSta);
-            }
-            if (statusMove != null)
-            {
-                movesToAdd.add(statusMove);
-            }
-
-            fitMovesIn(movesToAdd, moveset);
-        }
-
-        return moveset;
+        return offensiveWithSpecialMove(mon, maxTier, movesPhy, movesSta, MoveEffect.CURSE);
     }
 
     private ArrayList<Move> flailerMoveset(PokemonGame mon, int maxTier, ArrayList<Move> movesPhy, ArrayList<Move> movesSta)
@@ -785,6 +753,70 @@ class TeamCustomizer extends MoveAnalyser
 
         fitMovesIn(movesToAdd, moveset);
 
+        return moveset;
+    }
+    
+    private ArrayList<Move> bellyDrummerMoveset(PokemonGame mon, int maxTier, ArrayList<Move> movesPhy, ArrayList<Move> movesSta)
+    {
+        return offensiveWithSpecialMove(mon, maxTier, movesPhy, movesSta, MoveEffect.BELLY_DRUM);
+    }
+            
+    private ArrayList<Move> offensiveWithSpecialMove(PokemonGame mon, int maxTier, ArrayList<Move> movesPhy, ArrayList<Move> movesSta, MoveEffect moveEff)
+    {
+        ArrayList<Move> moveset = new ArrayList<>();
+        int curTier = maxTier;
+
+        do
+        {
+            basicOffenseMoveset(moveset, mon, curTier, movesPhy);
+            curTier--;
+        }
+        while (moveset.size() < 2 && curTier >= 0);
+
+        if (moveset.size() >= 2)
+        {
+            ArrayList<Move> movesToAdd = new ArrayList<>();
+
+            movesToAdd.add(pickMoveEffect(movesSta, moveEff));
+
+            // first, healing
+            Move healMove = pickHealingMove(movesSta);
+            if (healMove != null)
+            {
+                movesToAdd.add(healMove);
+            }
+
+            // explosion
+            Move moveExp = pickMoveEffect(movesPhy, MoveEffect.EXPLODE);
+            if (moveExp != null && healMove == null)
+            {
+                movesToAdd.add(moveExp);
+            }
+
+            // second, status inflicting
+            Move statusMove = null;
+            if (movesToAdd.isEmpty() || moveset.size() + movesToAdd.size() < 3)
+            {
+                statusMove = pickStatusMove(movesSta);
+            }
+            if (statusMove != null)
+            {
+                movesToAdd.add(statusMove);
+            }
+
+            fitMovesIn(movesToAdd, moveset);
+        }
+
+        return moveset;
+    }
+    
+    private ArrayList<Move> perishTrapperMoveset(PokemonGame mon, ArrayList<Move> movesOff, ArrayList<Move> movesSta)
+    {
+        ArrayList<Move> moveset = stallerMoveset(mon, movesOff, movesSta);
+        ArrayList<Move> movesToAdd = new ArrayList<>();
+        movesToAdd.add(pickMoveEffect(movesSta, MoveEffect.PERISH_SONG));
+        movesToAdd.add(pickMoveEffect(movesSta, MoveEffect.MEAN_LOOK));
+        fitMovesIn(movesToAdd, moveset);
         return moveset;
     }
 

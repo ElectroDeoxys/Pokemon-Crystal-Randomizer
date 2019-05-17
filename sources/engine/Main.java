@@ -42,7 +42,7 @@ class Main
             boolean trainerWSimilar = true; // trainer Pokemon with similar strength Pokemon
             int typeExpert = 2; // typeExpert (0 = no type specialists, 1 = preserve type specialists, 2 = randomize type specialists)
             boolean persRival = true; // have a Rival team with persistent Pokemon or not
-            boolean trainerNoLeg = false; // whether to have no legendary in Trainer parties or yes
+            boolean trainerNoLeg = true; // whether to have no legendary in Trainer parties or yes
             boolean extraCust = true; // whether to have customized Trainer Pokemon moves
 
             /////////////////////////////////////
@@ -106,7 +106,7 @@ class Main
             /////////////////////////////////////
             
             //dexRand.printPokedex(names);
-            trainerEditor.printCustTeams(names);
+            //trainerEditor.printCustTeams(names);
             //moveSorter.printMoveTiers(names);
 
             /////////////////////////////////////

@@ -27,7 +27,9 @@ class MoveAnalyser
         SLEEP_TALKER,
         DREAM_EATER,
         CURSER,
-        FLAILER;
+        FLAILER,
+        BELLY_DRUMMER,
+        PERISH_TRAPPER;
     }
 
     protected enum MoveEffect
@@ -86,6 +88,7 @@ class MoveAnalyser
         PRIORITY((byte) 0x67, false),
         TRIPLE_HIT((byte) 0x68, false),
         THIEF((byte) 0x69, true),
+        MEAN_LOOK((byte) 0x6A, true),
         NIGHTMARE((byte) 0x6B, true),
         CURSE((byte) 0x6D, true),
         PROTECT((byte) 0x6F, true),
@@ -93,7 +96,7 @@ class MoveAnalyser
         PERISH_SONG((byte) 0x72, true),
         SANDSTORM((byte) 0x73, true),
         ENDURE((byte) 0x74, true),
-        SWAGGER((byte) 0x74, true),
+        SWAGGER((byte) 0x76, true),
         ATTRACT((byte) 0x78, true),
         RETURN((byte) 0x79, true),
         PRESENT((byte) 0x7A, false),
@@ -249,6 +252,8 @@ class MoveAnalyser
                 return MoveEffect.TRIPLE_HIT;
             case (byte) 0x69:
                 return MoveEffect.THIEF;
+            case (byte) 0x6A:
+                return MoveEffect.MEAN_LOOK;
             case (byte) 0x6B:
                 return MoveEffect.NIGHTMARE;
             case (byte) 0x6D:

@@ -95,6 +95,14 @@ class PokemonClassifier extends MoveAnalyser
                 {
                     curRoles.add(Role.FLAILER);
                 }
+                if (isBellyDrummer(movepool, curRoles))
+                {
+                    curRoles.add(Role.BELLY_DRUMMER);
+                }
+                if (isPerishTrapper(movepool))
+                {
+                    curRoles.add(Role.PERISH_TRAPPER);
+                }
 
                 if (curRoles.isEmpty()) // if no roles applicable
                 {
@@ -274,6 +282,18 @@ class PokemonClassifier extends MoveAnalyser
         return ((hasMoveEffect(movepool, MoveEffect.REVERSAL))
                 && (hasMoveEffect(movepool, MoveEffect.ENDURE))
                 && (roles.contains(Role.PHYOFF)));
+    }
+    
+    private boolean isBellyDrummer(ArrayList<Move> movepool, ArrayList<Role> roles)
+    {
+        return ((hasMoveEffect(movepool, MoveEffect.BELLY_DRUM))
+                && (roles.contains(Role.PHYOFF)));
+    }
+    
+    private boolean isPerishTrapper(ArrayList<Move> movepool)
+    {
+        return ((hasMoveEffect(movepool, MoveEffect.PERISH_SONG))
+                && (hasMoveEffect(movepool, MoveEffect.MEAN_LOOK)));
     }
 
     private int numSupportMoves(ArrayList<Move> movepool)
