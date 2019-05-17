@@ -633,6 +633,10 @@ class TeamCustomizer extends MoveAnalyser
                 movesToAdd.add(healMove);
             }
         }
+        
+        Move damagingMove = getStrongestMove(mon, movesOff, false);
+        if (!hasOffensive && movesToAdd.size() < 4 && damagingMove != null)
+            movesToAdd.add(damagingMove);
 
         fitMovesIn(movesToAdd, moveset);
 
@@ -812,11 +816,60 @@ class TeamCustomizer extends MoveAnalyser
     
     private ArrayList<Move> perishTrapperMoveset(PokemonGame mon, ArrayList<Move> movesOff, ArrayList<Move> movesSta)
     {
-        ArrayList<Move> moveset = stallerMoveset(mon, movesOff, movesSta);
+        ArrayList<Move> moveset = new ArrayList<>();
         ArrayList<Move> movesToAdd = new ArrayList<>();
+        boolean hasOffensive = false;
+
+        // perish song and mean look combo
         movesToAdd.add(pickMoveEffect(movesSta, MoveEffect.PERISH_SONG));
         movesToAdd.add(pickMoveEffect(movesSta, MoveEffect.MEAN_LOOK));
+
+        // second, healing
+        Move healMove = pickHealingMove(movesSta);
+        if (healMove != null)
+        {
+            movesToAdd.add(healMove);
+        }
+
+        // third, semi-invulnerable moves
+        Move semiInvulnMove = pickMoveEffect(movesOff, MoveEffect.FLY_DIG);
+        if (semiInvulnMove != null && mon.getAtk() > 0.1 * mon.getBST()
+                && mon.getAtk() >= mon.getSAtk())
+        {
+            movesToAdd.add(semiInvulnMove);
+            hasOffensive = true;
+        }
+
+        // or a reliable damaging move
+        Move moveOff = getStrongestMove(mon, movesOff, false);
+        if (moveOff != null && !hasOffensive
+                && ((moveOff.getCat() == MOVE_PHYSICAL_CATEGORY && mon.getAtk() > 0.1 * mon.getBST())
+                || (moveOff.getCat() == MOVE_SPECIAL_CATEGORY && mon.getSAtk() > 0.1 * mon.getBST())))
+        {
+            movesToAdd.add(moveOff);
+            hasOffensive = true;
+        }
+
+        // fourth, cause confusion
+        Move staMove = pickMoveEffect(movesSta, MoveEffect.CAUSE_CNF);
+        if (staMove != null && moveset.size() < 4)
+        {
+            movesToAdd.add(staMove);
+        }
+
+        // fifth, protect
+        staMove = pickMoveEffect(movesSta, MoveEffect.PROTECT);
+        if (staMove != null && moveset.size() < 4)
+        {
+            movesToAdd.add(staMove);
+        }
+        
+        Move damagingMove = getStrongestMove(mon, movesOff, false);
+        if (!hasOffensive && movesToAdd.size() < 4 && damagingMove != null)
+            movesToAdd.add(damagingMove);
+
         fitMovesIn(movesToAdd, moveset);
+
         return moveset;
     }
 
