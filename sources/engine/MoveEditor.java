@@ -6,23 +6,24 @@ import static java.lang.Math.*;
 
 import static data.Constants.*;
 import data.Move;
+import java.util.Arrays;
 
 class MoveEditor
 {
-    private Move[] moves;
-    private byte[] moveTMBytes; // has bytes of TM, HM and move tutors
-    private Move[] movesTM = new Move[N_TM + N_HM + N_MOVE_TUTOR]; // actual Move classes of TM, HM and move tutors
+    private ArrayList<Move> moves;
+    private ArrayList<Move> movesTM = new ArrayList<>(N_TM + N_HM + N_MOVE_TUTOR); // actual Move classes of TM, HM and move tutors
     private byte[] critAnims; // moves with animations linked to higher crit rates
 
     MoveEditor(RomReader romReader) throws IOException
     {
-        this.moves = romReader.readRomMoves();
-        this.moveTMBytes = romReader.readRomTMs();
+        this.moves = new ArrayList<>(Arrays.asList(romReader.readRomMoves()));
         this.critAnims = romReader.readRomCritAnimations();
+        
+        byte[] moveTMBytes = romReader.readRomTMs();
 
-        for (int i = 0; i < movesTM.length; i++)
+        for (byte moveTMByte : moveTMBytes)
         {
-            movesTM[i] = moves[byteToValue(moveTMBytes[i]) - 1];
+            movesTM.add(moves.get(byteToValue(moveTMByte) - 1));
         }
     }
 
@@ -37,121 +38,115 @@ class MoveEditor
         }
     }
 
-    void randomizeTMs()
+    void randomizeTMs(boolean moveWSimilar)
     {
         ArrayList<Integer> tMList = new ArrayList<>();
 
         for (int i = 0; i < N_TM; i++)
         {
-            int randMove;
 
-            do
-            {
-                randMove = (int) floor(random() * N_MOVES);
-            }
-            while (tMList.contains(randMove)); // avoid repeats
-
-            tMList.add(randMove);
-            movesTM[i] = moves[randMove];
         }
     }
 
     void updateMoves()
     {
-        moves[13].setPP((byte) 0x14);
-        moves[18].setBasePower((byte) 0x5A);
-        moves[19].setAcc((byte) 0xD9);
-        moves[21].setBasePower((byte) 0x2D);
-        moves[21].setPP((byte) 0x19);
-        moves[25].setBasePower((byte) 0x64);
-        moves[25].setPP((byte) 0x0A);
-        moves[32].setBasePower((byte) 0x32);
-        moves[32].setAcc((byte) 0xFF);
-        moves[34].setAcc((byte) 0xE6);
-        moves[36].setBasePower((byte) 0x78);
-        moves[36].setPP((byte) 0x0A);
-        moves[41].setBasePower((byte) 0x19);
-        moves[41].setAcc((byte) 0xF2);
-        moves[49].setAcc((byte) 0xFF);
-        moves[50].setEffect((byte) 0x48); // acid lower Sp. Def
-        moves[52].setBasePower((byte) 0x5A);
-        moves[55].setBasePower((byte) 0x6E);
-        moves[56].setBasePower((byte) 0x5A);
-        moves[57].setBasePower((byte) 0x5A);
-        moves[58].setBasePower((byte) 0x6E);
-        moves[65].setPP((byte) 0x14);
-        moves[66].setAcc((byte) 0xFF);
-        moves[70].setPP((byte) 0x19);
-        moves[71].setPP((byte) 0x0F);
-        moves[73].setPP((byte) 0x14);
-        moves[79].setBasePower((byte) 0x78);
-        moves[79].setPP((byte) 0x0A);
-        moves[82].setBasePower((byte) 0x23);
-        moves[82].setAcc((byte) 0xD8);
-        moves[84].setBasePower((byte) 0x5A);
-        moves[85].setAcc((byte) 0xE5);
-        moves[86].setBasePower((byte) 0x6E);
-        moves[90].setBasePower((byte) 0x50);
-        moves[91].setAcc((byte) 0xE5);
-        moves[104].setPP((byte) 0x0A);
-        moves[106].setPP((byte) 0x0A);
-        moves[111].setPP((byte) 0x14);
-        moves[121].setBasePower((byte) 0x1E);
-        moves[122].setBasePower((byte) 0x1E);
-        moves[125].setBasePower((byte) 0x6E);
-        moves[126].setEffect((byte) 0x1F);
-        moves[126].setEffectChance((byte) 0x33);
-        moves[127].setAcc((byte) 0xD8);
-        moves[127].setPP((byte) 0x0F);
-        moves[129].setBasePower((byte) 0x82);
-        moves[129].setPP((byte) 0x1A);
-        moves[135].setBasePower((byte) 0x82);
-        moves[135].setPP((byte) 0x0A);
-        moves[136].setAcc((byte) 0xFF);
-        moves[138].setAcc((byte) 0xE5);
-        moves[140].setBasePower((byte) 0x50);
-        moves[140].setPP((byte) 0x0A);
-        moves[144].setBasePower((byte) 0x28);
-        moves[147].setAcc((byte) 0xFF);
-        moves[148].setAcc((byte) 0xFF);
-        moves[150].setPP((byte) 0x14);
-        moves[151].setBasePower((byte) 0x64);
-        moves[151].setAcc((byte) 0xE5);
-        moves[167].setBasePower((byte) 0x3C);
-        moves[167].setPP((byte) 0x19);
-        moves[172].setBasePower((byte) 0x32);
-        moves[173].setTypeCat((byte) (0x08 | 0b11000000));
-        moves[177].setAcc((byte) 0xFF);
-        moves[183].setAcc((byte) 0xFF);
-        moves[191].setBasePower((byte) 0x78);
-        moves[197].setAcc((byte) 0xE5);
-        moves[199].setBasePower((byte) 0x78);
-        moves[199].setPP((byte) 0x0A);
-        moves[201].setBasePower((byte) 0x4B);
-        moves[201].setPP((byte) 0x0A);
-        moves[206].setAcc((byte) 0xD8);
-        moves[209].setBasePower((byte) 0x28);
-        moves[241].setEffect((byte) 0x45); // crunch lower def
-        moves[247].setBasePower((byte) 0x78);
-        moves[247].setAcc((byte) 0xFF);
-        moves[247].setPP((byte) 0x0A);
-        moves[248].setBasePower((byte) 0x28);
-        moves[249].setBasePower((byte) 0x23);
-        moves[249].setAcc((byte) 0xD8);
+        moves.get(13).setPP((byte) 0x14);
+        moves.get(18).setBasePower((byte) 0x5A);
+        moves.get(19).setAcc((byte) 0xD9);
+        moves.get(21).setBasePower((byte) 0x2D);
+        moves.get(21).setPP((byte) 0x19);
+        moves.get(25).setBasePower((byte) 0x64);
+        moves.get(25).setPP((byte) 0x0A);
+        moves.get(32).setBasePower((byte) 0x32);
+        moves.get(32).setAcc((byte) 0xFF);
+        moves.get(34).setAcc((byte) 0xE6);
+        moves.get(36).setBasePower((byte) 0x78);
+        moves.get(36).setPP((byte) 0x0A);
+        moves.get(41).setBasePower((byte) 0x19);
+        moves.get(41).setAcc((byte) 0xF2);
+        moves.get(49).setAcc((byte) 0xFF);
+        moves.get(50).setEffect((byte) 0x48); // acid lower Sp. Def
+        moves.get(52).setBasePower((byte) 0x5A);
+        moves.get(55).setBasePower((byte) 0x6E);
+        moves.get(56).setBasePower((byte) 0x5A);
+        moves.get(57).setBasePower((byte) 0x5A);
+        moves.get(58).setBasePower((byte) 0x6E);
+        moves.get(65).setPP((byte) 0x14);
+        moves.get(66).setAcc((byte) 0xFF);
+        moves.get(70).setPP((byte) 0x19);
+        moves.get(71).setPP((byte) 0x0F);
+        moves.get(73).setPP((byte) 0x14);
+        moves.get(79).setBasePower((byte) 0x78);
+        moves.get(79).setPP((byte) 0x0A);
+        moves.get(82).setBasePower((byte) 0x23);
+        moves.get(82).setAcc((byte) 0xD8);
+        moves.get(84).setBasePower((byte) 0x5A);
+        moves.get(85).setAcc((byte) 0xE5);
+        moves.get(86).setBasePower((byte) 0x6E);
+        moves.get(90).setBasePower((byte) 0x50);
+        moves.get(91).setAcc((byte) 0xE5);
+        moves.get(104).setPP((byte) 0x0A);
+        moves.get(106).setPP((byte) 0x0A);
+        moves.get(111).setPP((byte) 0x14);
+        moves.get(121).setBasePower((byte) 0x1E);
+        moves.get(122).setBasePower((byte) 0x1E);
+        moves.get(125).setBasePower((byte) 0x6E);
+        moves.get(126).setEffect((byte) 0x1F);
+        moves.get(126).setEffectChance((byte) 0x33);
+        moves.get(127).setAcc((byte) 0xD8);
+        moves.get(127).setPP((byte) 0x0F);
+        moves.get(129).setBasePower((byte) 0x82);
+        moves.get(129).setPP((byte) 0x1A);
+        moves.get(135).setBasePower((byte) 0x82);
+        moves.get(135).setPP((byte) 0x0A);
+        moves.get(136).setAcc((byte) 0xFF);
+        moves.get(138).setAcc((byte) 0xE5);
+        moves.get(140).setBasePower((byte) 0x50);
+        moves.get(140).setPP((byte) 0x0A);
+        moves.get(144).setBasePower((byte) 0x28);
+        moves.get(147).setAcc((byte) 0xFF);
+        moves.get(148).setAcc((byte) 0xFF);
+        moves.get(150).setPP((byte) 0x14);
+        moves.get(151).setBasePower((byte) 0x64);
+        moves.get(151).setAcc((byte) 0xE5);
+        moves.get(167).setBasePower((byte) 0x3C);
+        moves.get(167).setPP((byte) 0x19);
+        moves.get(172).setBasePower((byte) 0x32);
+        moves.get(173).setTypeCat((byte) (0x08 | 0b11000000));
+        moves.get(177).setAcc((byte) 0xFF);
+        moves.get(183).setAcc((byte) 0xFF);
+        moves.get(191).setBasePower((byte) 0x78);
+        moves.get(197).setAcc((byte) 0xE5);
+        moves.get(199).setBasePower((byte) 0x78);
+        moves.get(199).setPP((byte) 0x0A);
+        moves.get(201).setBasePower((byte) 0x4B);
+        moves.get(201).setPP((byte) 0x0A);
+        moves.get(206).setAcc((byte) 0xD8);
+        moves.get(209).setBasePower((byte) 0x28);
+        moves.get(241).setEffect((byte) 0x45); // crunch lower def
+        moves.get(247).setBasePower((byte) 0x78);
+        moves.get(247).setAcc((byte) 0xFF);
+        moves.get(247).setPP((byte) 0x0A);
+        moves.get(248).setBasePower((byte) 0x28);
+        moves.get(249).setBasePower((byte) 0x23);
+        moves.get(249).setAcc((byte) 0xD8);
     }
 
     Move[] getMoves()
     {
-        return moves;
+        return moves.toArray(new Move[0]);
     }
 
     Move[] getAllLearnable()
     {
-        return movesTM;
+        return movesTM.toArray(new Move[0]);
     }
 
     byte[] getAllLearnableBytes()
     {
+        byte[] moveTMBytes = new byte[movesTM.size()];
+        int i = 0;
+        movesTM.forEach((moveTM) -> {moveTMBytes[i] = moveTM.getIndex();});
         return moveTMBytes;
     }
 
