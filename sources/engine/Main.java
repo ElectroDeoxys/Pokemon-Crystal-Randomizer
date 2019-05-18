@@ -34,6 +34,8 @@ class Main
             /////////////////////////////////////
 
             int starterKind = 1; // kinds of starters (0 = totally random, 1 = at least 1 evolution, 2 = 3-stage only)
+            
+            boolean movesWSimilar = true; // move TMs replaced by similar strength
 
             boolean routeWSimilar = true; // route Pokemon with similar strength Pokemon
             boolean routeNoLeg = true; // whether to have no legendary in wild or yes
@@ -69,7 +71,7 @@ class Main
             SpriteEditor spriteEditor = new SpriteEditor(dexRand, romReader);
 
             moveEditor.updateMoves();
-            //moveEditor.randomizeTMs();
+            moveEditor.randomizeTMs(movesWSimilar);
             romWriter.replaceAllMoves(moveEditor.getMoves(), moveEditor.getAllLearnable());
 
             MoveSorter moveSorter = new MoveSorter(moveEditor.getMoves(), moveEditor.getAllLearnable(), moveEditor.getCritAnims());
@@ -113,7 +115,7 @@ class Main
             // manipulate save data
             /////////////////////////////////////
             SavePatcher savPatcher = new SavePatcher(chSav);
-            savPatcher.generateTeam(monSorter, moveSorter, monEditor.getAllPokemon(), 5, 45);
+            savPatcher.generateTeam(monSorter, teamCust, monEditor.getAllPokemon(), 5, 45);
             savPatcher.updateChecksums();
         }
     }

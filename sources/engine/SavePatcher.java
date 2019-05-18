@@ -6,6 +6,7 @@ import java.nio.channels.FileChannel;
 import java.io.IOException;
 
 import static data.Constants.*;
+import data.Move;
 import static engine.RomReader.*;
 import static engine.RomWriter.*;
 
@@ -48,7 +49,7 @@ class SavePatcher
         }
     }
 
-    void generateTeam(PokemonSorter monSorter, MoveSorter moveSorter, PokemonGame[] mons, int nMons, int lvl) throws IOException
+    void generateTeam(PokemonSorter monSorter, TeamCustomizer teamCust, PokemonGame[] mons, int nMons, int lvl) throws IOException
     {
         // generates a nMons-party team with specified level
         PokemonGame[] monTeam = new PokemonGame[nMons];
@@ -80,14 +81,19 @@ class SavePatcher
         {
             lvlL[i] = lvl;
         }
+        
         monTeamInt = monSorter.evolveTeam(monTeamInt, lvlL);
+        
+        for (int i = 0; i < monTeam.length; i++)
+            monTeam[i] = mons[monTeamInt[i]-1];
 
         // apply moveset
         byte[][] moves = new byte[nMons][4];
-        for (int i = 0; i < nMons; i++)
-        {
-            moves[i] = monSorter.getMoveset(moveSorter, monTeamInt[i], valueToByte(lvl), true);
-        }
+        ArrayList<ArrayList<Move>> movesets = teamCust.customize(monTeam, lvlL, mons);
+        
+        for (int i = 0; i < moves.length; i++)
+            for (int j = 0; j < moves[i].length; j++)
+                moves[i][j] = movesets.get(i).get(j).getIndex();
 
         // create team for saving		
         SaveMon[] savMon = new SaveMon[nMons];

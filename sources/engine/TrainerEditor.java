@@ -91,7 +91,8 @@ class TrainerEditor
                 }
                 if (trainers[i].hasMoves()) // has moves
                 {
-                    newMoves[j] = getMoveset(moveSorter, newParty[j], valueToByte(newLvl[j]), false);
+                    for (int k = 0; k < 4; k++)
+                        newMoves[j][k] = (byte) 0x00;
                 }
             }
 
@@ -386,38 +387,6 @@ class TrainerEditor
                 t.setMoves(j, movesets.get(j));
             }
         }
-    }
-
-    byte[] getMoveset(MoveSorter moveSorter, int monInt, byte lvl, boolean extraCust)
-    {
-        int thisMon = monInt - 1;
-        byte[][] lvlMoves = mons[thisMon].getMovesUpToLevel(mons, lvl);
-
-        byte[] newMoves = new byte[4];
-
-        if (extraCust) // get customized moveset
-        {
-            byte[] eggMoves = mons[thisMon].getEggMovesCarry(); // egg moves it can carry
-            boolean[] moveComp = mons[thisMon].getCompatibilities();
-
-            newMoves = moveSorter.getTierMoveset(lvlMoves, eggMoves, moveComp, mons[thisMon].getTypes(), mons[thisMon].getBase(), lvl);
-        }
-        else // apply only level-up moves in reverse order
-        {
-            for (int k = 0; k < 4; k++)
-            {
-                if (k < lvlMoves[0].length)
-                {
-                    newMoves[k] = lvlMoves[0][k];
-                }
-                else
-                {
-                    newMoves[k] = (byte) 0x00;
-                }
-            }
-        }
-
-        return newMoves;
     }
 
     private Type[] randomizeTypeList(Type[] typeList)
