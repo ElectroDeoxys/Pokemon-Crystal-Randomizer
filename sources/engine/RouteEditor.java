@@ -6,6 +6,7 @@ import static java.lang.Math.*;
 import static data.Constants.*;
 import data.Route;
 import data.PokemonGame;
+import java.util.ArrayList;
 
 class RouteEditor
 {
@@ -37,7 +38,7 @@ class RouteEditor
                 for (int j = 0; j < routes[i].getTotalSlots(); j++)
                 {
                     PokemonGame initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeByte(j), mons);
-                    routes[i].setPoke(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, false));
+                    routes[i].setPoke(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false).getIntIndex());
                 }
             }
         }
@@ -51,10 +52,10 @@ class RouteEditor
             {
                 if ((typeRoutes) && (routes[i].getLandIndex() == 1)) // is a water route
                 {
-                    int[] waterArray = monSorter.getPokemonOfType(Type.WATER);
+                    ArrayList<PokemonGame> waterArray = monSorter.getPokemonOfType(Type.WATER);
                     for (int j = 0; j < routes[i].getNumberSpecies(); j++)
                     {
-                        routes[i].setSlot(j, waterArray[(int) floor(random() * waterArray.length)]);
+                        routes[i].setSlot(j, waterArray.get((int) floor(random() * waterArray.size())).getIntIndex());
                     }
                 }
                 else
@@ -75,7 +76,7 @@ class RouteEditor
                     for (int j = 0; j < routes[i].getNumberSpecies(); j++)
                     {
                         PokemonGame initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeSpeciesByte(j), mons);
-                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, Type.WATER, noLeg, false, false));
+                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, Type.WATER, noLeg, false).getIntIndex());
                     }
                 }
                 else if ((typeRoutes) && (arrayContains(INDEX_ROUTE_SPECIFIC_TYPES[0], i))) // for Ice Path
@@ -83,7 +84,7 @@ class RouteEditor
                     for (int j = 0; j < routes[i].getNumberSpecies(); j++)
                     {
                         PokemonGame initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeSpeciesByte(j), mons);
-                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, ROUTE_TYPES[0], noLeg));
+                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, ROUTE_TYPES[0], noLeg, false).getIntIndex());
                     }
                 }
                 else if ((typeRoutes) && (arrayContains(INDEX_ROUTE_SPECIFIC_TYPES[1], i))) // for Victory Road
@@ -91,7 +92,7 @@ class RouteEditor
                     for (int j = 0; j < routes[i].getNumberSpecies(); j++)
                     {
                         PokemonGame initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeSpeciesByte(j), mons);
-                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, ROUTE_TYPES[1], noLeg));
+                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, ROUTE_TYPES[1], noLeg, false).getIntIndex());
                     }
                 }
                 else
@@ -99,7 +100,7 @@ class RouteEditor
                     for (int j = 0; j < routes[i].getNumberSpecies(); j++)
                     {
                         PokemonGame initialMon = PokemonEditor.getPokemonFromByte(routes[i].getPokeSpeciesByte(j), mons);
-                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false, false));
+                        routes[i].setSlot(j, monSorter.getSameTier(initialMon, Type.NO_TYPE, noLeg, false).getIntIndex());
                     }
                 }
             }

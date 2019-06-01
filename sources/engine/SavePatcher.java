@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import static data.Constants.*;
 import data.Move;
+import data.Pokemon;
 import static engine.RomReader.*;
 import static engine.RomWriter.*;
 
@@ -67,13 +68,13 @@ class SavePatcher
             monTeam[i].setOldTier((int) floor(random() * (N_TIERS - 1)));
         }
 
-        ArrayList<Integer> prevMonList = new ArrayList<>(); // keep track of previous Pokemon in team
+        ArrayList<Pokemon> prevMonList = new ArrayList<>(); // keep track of previous Pokemon in team
 
         for (int i = 0; i < nMons; i++) // cycle party
         {
-            int[] prevMonArray = convertIntArray(prevMonList.toArray(new Integer[0]));
-            monTeamInt[i] = monSorter.getSameTier(monTeam[i], Type.NO_TYPE, false, false, true, prevMonArray);
-            prevMonList.add(monTeamInt[i]);
+            Pokemon chosenMon = monSorter.getSameTier(monTeam[i], false, false, true, prevMonList);
+            monTeamInt[i] = chosenMon.getIntIndex();
+            prevMonList.add(chosenMon);
         }
 
         int[] lvlL = new int[nMons];
@@ -93,7 +94,7 @@ class SavePatcher
         
         for (int i = 0; i < moves.length; i++)
             for (int j = 0; j < moves[i].length; j++)
-                moves[i][j] = movesets.get(i).get(j).getIndex();
+                moves[i][j] = (movesets.get(i).isEmpty()) ? (byte) 0x00 : movesets.get(i).get(j).getIndex();
 
         // create team for saving		
         SaveMon[] savMon = new SaveMon[nMons];

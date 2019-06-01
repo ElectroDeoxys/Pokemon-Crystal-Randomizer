@@ -5,6 +5,7 @@ import java.io.IOException;
 import static java.lang.Math.*;
 
 import static data.Constants.*;
+import data.Pokemon;
 import data.PokemonGame;
 
 class PokemonEditor
@@ -36,7 +37,7 @@ class PokemonEditor
             {
                 byte[] moveRand =
                 {
-                    move[j][0], (byte) (random() * N_MOVES)
+                    move[j][0], (byte) (random() * N_MOVES + 1)
                 };
                 mons[i].setMove(j, moveRand);
             }
@@ -134,10 +135,8 @@ class PokemonEditor
             int randIndex = (int) floor(random() * mons.length);
             byte[] eggMoves = mons[randIndex].getEggMoves();
 
-            if (eggMoves.length == 0)
-            {
-                continue; // skip Pokemon with no egg moves
-            }
+            if (eggMoves.length == 0) continue; // skip Pokemon with no egg moves
+
             ArrayList<Byte> eggMovesList = new ArrayList<>(eggMoves.length);
 
             for (byte eggMove : eggMoves)
@@ -150,7 +149,7 @@ class PokemonEditor
 
             eggMoves = convertByteArray(eggMovesList.toArray(new Byte[0]));
 
-            mons[count].setEggMoves(eggMoves);
+            mons[randIndex].setEggMoves(eggMoves);
 
             size = getEggMoveSize();
         }
@@ -182,5 +181,20 @@ class PokemonEditor
     PokemonGame[] getAllPokemon()
     {
         return mons;
+    }
+    
+    public Pokemon byteToMon(byte x)
+    {
+        return mons[byteToValue(x) - 1];
+    }
+    
+    public Pokemon[] bytesToMon(byte[] a)
+    {
+        Pokemon[] out = new Pokemon[a.length];
+        
+        for (int i = 0; i < a.length; i++)
+            out[i] = byteToMon(a[i]);
+        
+        return out;
     }
 }

@@ -1,5 +1,6 @@
 package engine;
 
+import static data.Constants.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.channels.FileChannel;
@@ -85,7 +86,7 @@ class Main
             romWriter.replaceAllSprites(spriteEditor.getAllSprites(), spriteEditor.getAllTrainerSprites(), spriteEditor.getEggSprite(), spriteEditor.getAllPalettes());
 
             Names names = new Names(monEditor.getAllPokemon(), trainerEditor.getTrainers(), moveEditor.getMoves());
-            PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), romReader.readRomStarters());
+            PokemonSorter monSorter = new PokemonSorter(monEditor.getAllPokemon(), monEditor.bytesToMon(romReader.readRomStarters()));
 
             romWriter.randomizeStarters(monSorter, starterKind);
 

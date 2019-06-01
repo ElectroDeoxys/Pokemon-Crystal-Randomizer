@@ -10,6 +10,7 @@ import data.Trainer;
 import data.PokemonGame;
 import data.Move;
 import data.Sprite;
+import java.util.ArrayList;
 
 class RomWriter
 {
@@ -45,7 +46,12 @@ class RomWriter
 
     void randomizeStarters(PokemonSorter monSorter, int starterKind) throws IOException
     {
-        byte[] str = valueToByte(monSorter.getRandomStarters(starterKind)); // array with the new starters
+        ArrayList<PokemonGame> starterList = monSorter.getRandomStarters(starterKind);
+        int[] intArray = starterList.stream()
+                                    .mapToInt(PokemonGame::getIntIndex)
+                                    .toArray();
+        
+        byte[] str = valueToByte(intArray); // array with the new starters
 
         for (int i = 0; i < 3; i++)
         {

@@ -25,6 +25,7 @@ public class PokemonData extends Pokemon
 		this.eggMoveCarry = new byte[0];
 
 		resolveType();
+                setValue();
 	}
 	
 	public PokemonGame convertPokemon(int newIndex, byte[][] newEvo, byte[] newPreEvo)

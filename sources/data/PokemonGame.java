@@ -27,6 +27,7 @@ public class PokemonGame extends Pokemon
 
         convertCompatibilities();
         resolveType();
+        setValue();
     }
 
     /////////////////////////////////////////////

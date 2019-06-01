@@ -1,6 +1,7 @@
 package data;
 
 import static java.lang.Math.*;
+import java.util.ArrayList;
 
 public class Constants
 {
@@ -611,5 +612,15 @@ public class Constants
             }
         }
         return res;
+    }
+    
+    public static <T> T randomElement(T[] arr)
+    {
+        return (arr[(int) floor(arr.length * random())]);
+    }
+    
+    public static <T> T randomElement(ArrayList<T> list)
+    {
+        return (list.get((int) floor(list.size() * random())));
     }
 }

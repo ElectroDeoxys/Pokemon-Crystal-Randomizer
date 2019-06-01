@@ -5,7 +5,7 @@ import static java.lang.Math.*;
 
 import static data.Constants.*;
 
-public abstract class Pokemon
+public abstract class Pokemon extends Tierable
 {
     protected int trueIndex; // national index of Pokemon
 
@@ -24,7 +24,6 @@ public abstract class Pokemon
     protected byte[] eggMove;
     protected byte[] eggMoveCarry; // egg moves that it can carry from itself or pre-evolutions
 
-    protected int tier = 0; // tier list to compare strengths
     protected int typeTier = 0; // tier list to compare strengths for same type
 
     protected byte[] preEvo = new byte[0]; // lists pre-evolution
@@ -35,14 +34,12 @@ public abstract class Pokemon
 
     protected boolean[] tmhmComp = new boolean[N_TM + N_HM + N_MOVE_TUTOR];
 
-    protected int oldTier = -1; // tier list to compare strengths from Pokemon it replaced in the old Pokedex
-    protected int oldTypeTier = -1; // tier list to compare strengths for same type from Pokemon it replaced in the old Pokedex
-
     /////////////////////////////////////////////
     // Return value methods
     /////////////////////////////////////////////
     public abstract int getIntIndex();
 
+    @Override
     public int getTrueIndex()
     {
         return this.trueIndex;
@@ -151,11 +148,6 @@ public abstract class Pokemon
             BST += byteToValue(b);
         }
         return BST;
-    }
-
-    public int getTier()
-    {
-        return this.tier;
     }
 
     public int getTypeTier()
@@ -282,16 +274,6 @@ public abstract class Pokemon
         return lvlMoves;
     }
 
-    public int getOldTier()
-    {
-        return this.oldTier;
-    }
-
-    public int getOldTypeTier()
-    {
-        return this.oldTypeTier;
-    }
-
     public int getTotalExp(int lvl)
     {
         // calculates this Pokemon's total Exp. Points at level lvl
@@ -413,11 +395,6 @@ public abstract class Pokemon
         this.eggMoveCarry = eggMoves;
     }
 
-    public void setTier(int tier)
-    {
-        this.tier = tier;
-    }
-
     public void setTypeTier(int typeTier)
     {
         this.typeTier = typeTier;
@@ -441,5 +418,11 @@ public abstract class Pokemon
     public void setOldTypeTier(int oldTypeTier)
     {
         this.oldTypeTier = oldTypeTier;
+    }
+    
+    @Override
+    public final void setValue()
+    {
+        value = getBST();
     }
 }

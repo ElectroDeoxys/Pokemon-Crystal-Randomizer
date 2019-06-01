@@ -2,7 +2,7 @@ package data;
 
 import static data.Constants.*;
 
-public class Move
+public class Move extends Tierable
 {
     private int index; // index of move
     private byte animIndex; // index of animation
@@ -29,6 +29,7 @@ public class Move
         this.pP = pP;
 
         resolveType();
+        setValue();
     }
 
     /////////////////////////////////////////////
@@ -38,6 +39,12 @@ public class Move
     {
         byte out = (byte) (this.index + 0x1);
         return out;
+    }
+    
+    @Override
+    public int getTrueIndex()
+    {
+        return byteToValue(getIndex());
     }
 
     public byte getAnimIndex()
@@ -163,6 +170,13 @@ public class Move
     public void setName(byte[] name)
     {
         this.name = name;
+    }
+    
+    @Override
+    public final void setValue()
+    {
+        if (calcPower > 1) value = calcPower;
+        else value = pP;
     }
 
     public static int convertIndexToOffset(int n)
